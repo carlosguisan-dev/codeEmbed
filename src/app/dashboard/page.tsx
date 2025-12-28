@@ -22,7 +22,7 @@ export default function DashboardPage() {
     error,
   } = useCollection<Snippet>(snippetsQuery);
 
-  if (isLoading || isUserLoading) {
+  if (isLoading || isUserLoading || (!snippets && !error)) {
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

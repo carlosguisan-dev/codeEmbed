@@ -16,14 +16,26 @@ interface TranslationContextType {
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
 
 export const TranslationProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Locale>('en');
+  const [language, setLanguage] = useState<Locale>('es');
 
   useEffect(() => {
-    const browserLang = navigator.language.split('-')[0];
-    if (browserLang === 'es') {
-      setLanguage('es');
+    // We try to set the language from localStorage first.
+    const storedLang = localStorage.getItem('language') as Locale;
+    if (storedLang && (storedLang === 'en' || storedLang === 'es')) {
+      setLanguage(storedLang);
+    } else {
+      // Otherwise, we check the browser language.
+      const browserLang = navigator.language.split('-')[0];
+      if (browserLang === 'en') {
+        setLanguage('en');
+      }
     }
   }, []);
+
+  const handleSetLanguage = (lang: Locale) => {
+    setLanguage(lang);
+    localStorage.setItem('language', lang);
+  };
 
   const t = (key: keyof typeof en, options?: { [key: string]: string | number }) => {
     let text = translations[language][key] || translations['en'][key] || key;
@@ -36,7 +48,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <TranslationContext.Provider value={{ language, setLanguage, t }}>
+    <TranslationContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
       {children}
     </TranslationContext.Provider>
   );

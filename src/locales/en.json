@@ -47,9 +47,6 @@
     "line_numbers_desc": "Display line numbers next to the code.",
     "public_access_label": "Public Access",
     "public_access_desc": "Allow anyone with the link to view this snippet.",
-    "live_preview_title": "Live Preview",
-    "live_preview_desc": "See how your snippet will look when embedded.",
-    "preview_height_label": "Preview Height",
     "theme_previews_title": "Theme Previews",
     "light_theme_preview": "Light Theme",
     "dark_theme_preview": "Dark Theme",
@@ -69,5 +66,13 @@
     "delete_dialog_title": "Are you absolutely sure?",
     "delete_dialog_desc": "This action cannot be undone. This will permanently delete your snippet and remove its data from our servers.",
     "cancel": "Cancel",
-    "confirm_delete_button": "Yes, delete snippet"
+    "confirm_delete_button": "Yes, delete snippet",
+    "profile_settings_title": "Profile Settings",
+    "personal_info_title": "Personal Information",
+    "personal_info_desc": "Update your name and account details.",
+    "full_name_label": "Full Name",
+    "full_name_placeholder": "Your full name",
+    "email_label": "Email",
+    "language_settings_title": "Language Settings",
+    "language_settings_desc": "Choose the language for the application interface."
 }

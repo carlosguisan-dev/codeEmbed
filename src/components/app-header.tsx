@@ -12,6 +12,7 @@ export function AppHeader() {
     if (pathname.includes('/dashboard')) return t('dashboard_title');
     if (pathname.includes('/snippets/new')) return t('new_snippet_title');
     if (pathname.includes('/edit')) return t('edit_snippet_title');
+    if (pathname.includes('/profile')) return t('profile_settings_title');
     return 'CodeEmbed';
   };
 

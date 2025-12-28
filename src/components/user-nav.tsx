@@ -17,6 +17,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { LanguageSwitcher } from './language-switcher';
+import Link from 'next/link';
 
 export function UserNav() {
   const { auth, user } = useFirebase();
@@ -84,9 +85,11 @@ export function UserNav() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/profile">
                 <UserIcon className="mr-2 h-4 w-4" />
                 <span>{t('profile')}</span>
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />

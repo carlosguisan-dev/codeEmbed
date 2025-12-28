@@ -9,7 +9,7 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
-import { FirebaseClientProvider, useDoc, useFirebase, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
+import { FirebaseClientProvider, useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import type { Snippet } from '@/lib/definitions';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,15 +24,21 @@ function EmbedPageContent({ id }: { id: string }) {
   const { data: snippet, isLoading } = useDoc<Snippet>(snippetRef);
 
   useEffect(() => {
+    // Only increment the view count if we have the snippet data and a firestore instance.
+    // This prevents trying to update a document that hasn't been loaded yet.
     if (snippet && firestore) {
-      const docRef = doc(firestore, 'snippets', snippet.id);
-      // Use the non-blocking update function to increment the view count
-      // Errors will be caught and emitted by the global error handler
-      updateDocumentNonBlocking(docRef, {
+      const docRef = doc(firestore, 'snippets', id);
+      // We use a simple updateDoc here. The non-blocking wrapper isn't strictly necessary
+      // for this use case, as we don't need optimistic UI updates for a view counter.
+      updateDoc(docRef, {
         viewCount: increment(1),
+      }).catch(err => {
+        // Silently fail on view count increment error.
+        // It's not critical for the user experience on the embed page.
+        console.error("Failed to increment view count:", err);
       });
     }
-  }, [snippet, firestore]);
+  }, [snippet, firestore, id]);
 
 
   if (isLoading) {

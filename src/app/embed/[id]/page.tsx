@@ -9,8 +9,8 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
-import { FirebaseClientProvider, useDoc, useFirebase, useMemoFirebase } from '@/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { FirebaseClientProvider, useDoc, useFirebase, useMemoFirebase, updateDocumentNonBlocking } from '@/firebase';
+import { doc, updateDoc, increment } from 'firebase/firestore';
 import type { Snippet } from '@/lib/definitions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect } from 'react';
@@ -26,9 +26,11 @@ function EmbedPageContent({ id }: { id: string }) {
   useEffect(() => {
     if (snippet && firestore) {
       const docRef = doc(firestore, 'snippets', snippet.id);
-      updateDoc(docRef, {
-        viewCount: (snippet.viewCount || 0) + 1,
-      }).catch(err => console.error("Failed to update view count:", err));
+      // Use the non-blocking update function to increment the view count
+      // Errors will be caught and emitted by the global error handler
+      updateDocumentNonBlocking(docRef, {
+        viewCount: increment(1),
+      });
     }
   }, [snippet, firestore]);
 

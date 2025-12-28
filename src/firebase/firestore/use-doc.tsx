@@ -48,6 +48,16 @@ export function useDoc<T = any>(
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
+    if (memoizedDocRef && !(memoizedDocRef as any).__memo) {
+      const errorMessage = `useDoc received a DocumentReference that was not memoized with useMemoFirebase. This can lead to infinite loops and excessive Firestore reads. Please wrap the doc() call in useMemoFirebase.`;
+      console.error(errorMessage);
+      const devError = new Error(errorMessage);
+      setError(devError);
+      // In a real app, you might want to throw this error in development
+      // to make it impossible to ignore.
+      return;
+    }
+
     if (!memoizedDocRef) {
       setData(null);
       setIsLoading(false);
@@ -57,7 +67,6 @@ export function useDoc<T = any>(
 
     setIsLoading(true);
     setError(null);
-    // Optional: setData(null); // Clear previous data instantly
 
     const unsubscribe = onSnapshot(
       memoizedDocRef,

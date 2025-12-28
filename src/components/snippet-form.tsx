@@ -57,13 +57,43 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
   }, [formData.code]);
 
 
-  const validate = () => {
-    const newErrors: {title?: string, code?: string} = {};
-    if (!formData.title) newErrors.title = 'Title is required';
-    if (!formData.code) newErrors.code = 'Code cannot be empty';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }
+  const validateAndSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Basic client-side validation
+    if (!formData.title || !formData.code) {
+        toast({
+            variant: 'destructive',
+            title: t('toast_error_title'),
+            description: 'Title and Code fields cannot be empty.',
+        });
+        const newErrors: {title?: string, code?: string} = {};
+        if (!formData.title) newErrors.title = 'Title is required';
+        if (!formData.code) newErrors.code = 'Code cannot be empty';
+        setErrors(newErrors);
+        return;
+    }
+    setErrors({});
+
+    startTransition(async () => {
+      const action = isEditMode ? updateSnippetAction : createSnippetAction;
+      const payload = isEditMode ? { id: snippet.id, ...formData } : formData;
+      const result = await action(payload as any);
+
+      if (result.success && result.data) {
+        toast({ title: isEditMode ? t('toast_snippet_updated_title') : t('toast_snippet_created_title'), description: formData.title });
+        setSavedSnippet(result.data);
+        if (!isEditMode) {
+            router.push(`/snippets/${result.data.id}/edit`, { scroll: false });
+        } else {
+            // In edit mode, maybe just show the share dialog
+            setEmbedDialogOpen(true);
+        }
+      } else {
+        toast({ variant: 'destructive', title: t('toast_error_title'), description: result.message });
+      }
+    });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
@@ -78,34 +108,9 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
       setFormData(prev => ({ ...prev, [name]: checked }));
   };
 
-
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) {
-      return;
-    }
-
-    startTransition(async () => {
-      const action = isEditMode ? updateSnippetAction : createSnippetAction;
-      const payload = isEditMode ? { id: snippet.id, ...formData } : formData;
-      const result = await action(payload as any);
-
-      if (result.success && result.data) {
-        toast({ title: isEditMode ? t('toast_snippet_updated_title') : t('toast_snippet_created_title'), description: formData.title });
-        setSavedSnippet(result.data);
-        if (!isEditMode) {
-            router.push(`/snippets/${result.data.id}/edit`);
-            setEmbedDialogOpen(true);
-        }
-      } else {
-        toast({ variant: 'destructive', title: t('toast_error_title'), description: result.message });
-      }
-    });
-  };
-
   return (
     <>
-    <form onSubmit={onSubmit} className="space-y-8">
+    <form onSubmit={validateAndSubmit} className="space-y-8">
         <Card>
             <CardHeader>
                 <CardTitle className="font-headline">{t('title_label')}</CardTitle>

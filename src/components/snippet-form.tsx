@@ -96,9 +96,9 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
   return (
     <>
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Editor Side */}
-        <div className="space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle className="font-headline">{t('editor_title')}</CardTitle>
@@ -179,7 +179,7 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
         </div>
 
         {/* Preview Side */}
-        <div className="space-y-6">
+        <div className="space-y-6 lg:col-span-1">
           <Card>
             <CardHeader>
                 <CardTitle className="font-headline">{t('live_preview_title')}</CardTitle>
@@ -204,7 +204,7 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
             <CardHeader>
                 <CardTitle className="font-headline">{t('theme_previews_title')}</CardTitle>
             </CardHeader>
-             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:grid-cols-1">
                 <div>
                     <Label className="text-muted-foreground">{t('light_theme_preview')}</Label>
                     <div className="mt-2 rounded-lg border p-2 bg-muted/30 h-48 overflow-auto">

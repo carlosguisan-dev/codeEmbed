@@ -6,13 +6,9 @@
       "type": "object",
       "description": "Represents a code snippet stored in the system.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the snippet."
-        },
         "userId": {
           "type": "string",
-          "description": "Reference to the User who created the snippet. (Relationship: User 1:N Snippet)"
+          "description": "Reference to the User who created the snippet."
         },
         "title": {
           "type": "string",
@@ -47,10 +43,16 @@
         "viewCount": {
           "type": "number",
           "description": "Number of times the snippet has been viewed."
+        },
+        "theme": {
+            "type": "string",
+            "enum": ["light", "dark"]
+        },
+        "lineNumbers": {
+            "type": "boolean"
         }
       },
       "required": [
-        "id",
         "userId",
         "title",
         "code",
@@ -58,7 +60,9 @@
         "isPublic",
         "createdAt",
         "updatedAt",
-        "viewCount"
+        "viewCount",
+        "theme",
+        "lineNumbers"
       ]
     },
     "User": {
@@ -67,10 +71,6 @@
       "type": "object",
       "description": "Represents a user of the application. Note: User authentication details are assumed to be managed externally.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the user."
-        },
         "username": {
           "type": "string",
           "description": "Username of the user."
@@ -82,7 +82,6 @@
         }
       },
       "required": [
-        "id",
         "username",
         "email"
       ]
@@ -113,42 +112,21 @@
         }
       },
       {
-        "path": "/users/{userId}/snippets/{snippetId}",
+        "path": "/snippets/{snippetId}",
         "definition": {
           "entityName": "Snippet",
           "schema": {
             "$ref": "#/backend/entities/Snippet"
           },
-          "description": "Stores code snippets created by a specific user. Only the user can access their own snippets.",
+          "description": "Stores all code snippets. Public snippets are readable by anyone, while private snippets are only readable by their owner.",
           "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user."
-            },
             {
               "name": "snippetId",
               "description": "The unique identifier of the snippet."
             }
           ]
         }
-      },
-      {
-        "path": "/public_snippets/{snippetId}",
-        "definition": {
-          "entityName": "Snippet",
-          "schema": {
-            "$ref": "#/backend/entities/Snippet"
-          },
-          "description": "Stores publicly accessible code snippets. Anyone can read these snippets.",
-          "params": [
-            {
-              "name": "snippetId",
-              "description": "The unique identifier of the public snippet."
-            }
-          ]
-        }
       }
-    ],
-    "reasoning": "The Firestore structure is designed to be secure, scalable, and easily debuggable, adhering to the core design principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters).  \n\n**Authorization Independence:**\nSnippets are stored under `/users/{userId}/snippets/{snippetId}`.  Authorization is based solely on the `request.auth.uid` matching the `userId` in the path. Public snippets are stored separately in `/public_snippets/{snippetId}`, avoiding the need for complex `get()` calls to determine ownership.  No parent document data is required to authorize access to a snippet.\n\n**Structural Segregation:**\nPublic and private snippets are stored in separate collections (`/public_snippets` and `/users/{userId}/snippets`), ensuring that all documents within a collection share the same security posture.  This avoids mixing public and private data in the same collection and simplifies security rules.\n\n**Access Modeling:**\n- **Private Data:** Path-based ownership (`/users/{userId}/snippets/{snippetId}`) is used for user-owned snippets. This is the preferred pattern for private data.\n- **Public Data:**  Public snippets are stored in `/public_snippets/{snippetId}` and are readable by anyone.\n\n**QAPs (Rules are not Filters):**\nThe segregation of public and private snippets into separate collections enables secure list operations.  A rule can allow anyone to list documents in `/public_snippets` without risking exposure of private snippets. User-owned snippets can be listed by the user identified by `request.auth.uid` in their path (`/users/{userId}/snippets`).\n\n**Clarity of Intent (Debuggability):** The structure makes authorization intent explicit through the use of path-based ownership and separate collections for public and private data.  This simplifies security rules and makes them easier to understand and debug.\n\n**Invariants:** The structure supports invariants such as ownership and timestamps. Ownership is enforced by the path structure (`/users/{userId}/snippets/{snippetId}`). Timestamps (`createdAt`, `updatedAt`) can be enforced using security rules to ensure that they are set correctly on creation and updates."
+    ]
   }
 }

@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
-import { FirebaseClientProvider, useFirebase } from '@/firebase';
+import { useFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/icons';
 import { Loader2 } from 'lucide-react';
@@ -123,9 +123,5 @@ function LoginPageContent() {
 }
 
 export default function LoginPage() {
-  return (
-    <FirebaseClientProvider>
-      <LoginPageContent />
-    </FirebaseClientProvider>
-  );
+  return <LoginPageContent />;
 }

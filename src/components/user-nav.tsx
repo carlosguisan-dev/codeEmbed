@@ -25,14 +25,21 @@ export function UserNav() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    if (!auth) return;
+    if (!auth) {
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Firebase Auth not available.',
+        });
+        return;
+    };
 
     try {
       await auth.signOut();
-      
-      // Redirect to login page after successful logout on all levels
+      // After sign-out, onAuthStateChanged in the provider will trigger an update.
+      // The layout's useEffect will then handle the redirect to the login page.
+      // We can also push programmatically for a faster redirect.
       router.push('/login');
-
     } catch (error: any) {
       console.error('Logout failed:', error);
       toast({
@@ -44,7 +51,8 @@ export function UserNav() {
   };
   
   if (!user) {
-    // Should not happen on protected routes, but as a fallback
+    // This can appear briefly during logout or if auth state is lost.
+    // It's better not to render anything in this case.
     return null;
   }
   

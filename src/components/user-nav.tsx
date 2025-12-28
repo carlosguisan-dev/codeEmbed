@@ -19,10 +19,23 @@ import { useTranslation } from '@/hooks/use-translation';
 import { LanguageSwitcher } from './language-switcher';
 import { useFirebase } from '@/firebase';
 import { Skeleton } from './ui/skeleton';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
+async function handleLogout() {
+    const response = await fetch('/api/auth/session', { method: 'DELETE' });
+    if (response.ok) {
+        window.location.href = '/login';
+    } else {
+        console.error('Logout failed');
+    }
+}
 
 export function UserNav() {
   const { t } = useTranslation();
-  const { user, isUserLoading } = useFirebase();
+  const { user, isUserLoading, auth } = useFirebase();
+  const router = useRouter();
+
 
   if (isUserLoading) {
     return (
@@ -37,7 +50,9 @@ export function UserNav() {
     return (
         <div className="flex items-center gap-2">
             <LanguageSwitcher />
-            <Button variant="outline">Sign In</Button>
+            <Button asChild variant="outline">
+              <Link href="/login">Sign In</Link>
+            </Button>
         </div>
     )
   }
@@ -57,7 +72,7 @@ export function UserNav() {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{user.displayName}</p>
+              <p className="text-sm font-medium leading-none">{user.displayName || user.email}</p>
               <p className="text-xs leading-none text-muted-foreground">
                 {user.email}
               </p>
@@ -70,7 +85,7 @@ export function UserNav() {
             <DropdownMenuItem>{t('settings')}</DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>{t('logout')}</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>{t('logout')}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

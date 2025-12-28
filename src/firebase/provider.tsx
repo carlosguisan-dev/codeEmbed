@@ -114,8 +114,7 @@ const useFirebaseContext = () => {
  * Throws error if core services are not available or used outside provider.
  */
 export const useFirebase = (): FirebaseServicesAndUser => {
-  const context = useFirebaseContext();
-  return context;
+  return useFirebaseContext();
 };
 
 /** Hook to access Firebase Auth instance. */

@@ -3,7 +3,6 @@
 import { useFirebase, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, where } from 'firebase/firestore';
 import type { Snippet } from '@/lib/definitions';
-import { DashboardClient } from '@/components/dashboard-client';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import Link from 'next/link';

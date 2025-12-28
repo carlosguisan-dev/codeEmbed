@@ -5,7 +5,7 @@ export function Logo(props: Omit<SVGProps<SVGSVGElement>, 'src'>) {
     return (
         <div {...props} style={{ position: 'relative', width: props.width, height: props.height }}>
             <Image
-                src="https://50594343.fs1.hubspotusercontent-na1.net/hubfs/50594343/demos/CodeEmbed/CE%20logo%20horizontal.svg"
+                src="https://carlosguisan.dev/hubfs/demos/CodeEmbed/CE%20logo%20horizontal.svg"
                 alt="CodeEmbed Logo"
                 fill
                 style={{ objectFit: 'contain' }}

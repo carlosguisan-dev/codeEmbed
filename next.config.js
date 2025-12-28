@@ -32,6 +32,12 @@ const nextConfig = {
         hostname: '50594343.fs1.hubspotusercontent-na1.net',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'carlosguisan.dev',
+        port: '',
+        pathname: '/**',
       }
     ],
   },

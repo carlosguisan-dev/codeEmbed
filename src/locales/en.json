@@ -85,5 +85,6 @@
     "go_to_app_button": "Go to App",
     "landing_title": "Create and Share Code Snippets with Style",
     "landing_desc": "CodeEmbed allows you to create, customize, and share your code fragments in a visually appealing and simple way.",
-    "landing_cta_button": "Get Started Now"
+    "landing_cta_button": "Get Started Now",
+    "powered_by": "Powered by"
 }

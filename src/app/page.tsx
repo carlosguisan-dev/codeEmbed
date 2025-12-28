@@ -53,14 +53,20 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="bg-muted rounded-lg p-6 flex items-center justify-center">
-                  <div className="w-full max-w-md bg-card p-4 rounded-lg border shadow-lg">
-                      <div className="flex justify-between items-center pb-2 border-b mb-2">
+                  <div className="w-full max-w-md bg-card rounded-lg border shadow-lg overflow-hidden">
+                      <div className="flex justify-between items-center px-4 py-2 border-b">
                           <span className="text-xs text-foreground/80">javascript</span>
                           <span className="text-xs text-foreground/50">code-embed.app</span>
                       </div>
-                      <pre className="text-sm text-foreground/90 whitespace-pre-wrap break-words">
+                      <pre className="text-sm text-foreground/90 whitespace-pre-wrap break-words p-4">
                         <code dangerouslySetInnerHTML={{ __html: codeExample }} />
                       </pre>
+                       <div className="bg-muted/50 px-4 py-2 border-t">
+                            <Link href="/" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
+                                <span>{t('powered_by')}</span>
+                                <Logo width={100} height={25} />
+                            </Link>
+                        </div>
                   </div>
               </div>
             </div>

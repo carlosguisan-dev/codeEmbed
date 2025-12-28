@@ -81,5 +81,9 @@
     "password_label": "Contraseña",
     "login_button": "Iniciar Sesión",
     "login_error_title": "Fallo de Autenticación",
-    "login_error_invalid_credentials": "Correo electrónico o contraseña inválidos."
+    "login_error_invalid_credentials": "Correo electrónico o contraseña inválidos.",
+    "go_to_app_button": "Ir a la App",
+    "landing_title": "Crea y Comparte Snippets de Código con Estilo",
+    "landing_desc": "CodeEmbed te permite crear, personalizar y compartir tus fragmentos de código de una manera visualmente atractiva y sencilla.",
+    "landing_cta_button": "Empezar ahora"
 }

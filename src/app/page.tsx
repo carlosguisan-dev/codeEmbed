@@ -3,8 +3,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Logo } from '@/components/icons';
 import { Code, Share2, ArrowRight } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 export default function LandingPage() {
+  const { t } = useTranslation();
 
   const codeExample = `
 <span class="text-purple-400">function</span> <span class="text-blue-400">helloWorld</span>() {
@@ -23,7 +25,7 @@ export default function LandingPage() {
         <nav className="ml-auto flex gap-4 sm:gap-6">
             <Button asChild variant="ghost">
                 <Link href="/dashboard">
-                    Go to App
+                    {t('go_to_app_button')}
                 </Link>
             </Button>
         </nav>
@@ -35,16 +37,16 @@ export default function LandingPage() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline">
-                    Crea y Comparte Snippets de Código con Estilo
+                    {t('landing_title')}
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    CodeEmbed te permite crear, personalizar y compartir tus fragmentos de código de una manera visualmente atractiva y sencilla.
+                    {t('landing_desc')}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg">
                     <Link href="/dashboard">
-                      Empezar ahora
+                      {t('landing_cta_button')}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>

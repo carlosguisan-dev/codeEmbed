@@ -16,24 +16,27 @@ interface TranslationContextType {
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
 
 export const TranslationProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Locale>('es');
+  const [language, setLanguage] = useState<Locale>('es'); // Default to Spanish
 
   useEffect(() => {
-    // We try to set the language from localStorage first.
+    // 1. Try to get language from localStorage (user's explicit choice)
     const storedLang = localStorage.getItem('language') as Locale;
     if (storedLang && (storedLang === 'en' || storedLang === 'es')) {
       setLanguage(storedLang);
-    } else {
-      // Otherwise, we check the browser language.
-      const browserLang = navigator.language.split('-')[0];
-      if (browserLang === 'en') {
-        setLanguage('en');
-      }
+      return; // Stop if we found a stored language
     }
+
+    // 2. If no stored language, check browser language
+    const browserLang = navigator.language.split('-')[0];
+    if (browserLang === 'en') {
+      setLanguage('en');
+    }
+    // If browser language is 'es' or something else, it will default to 'es' as per initialState.
   }, []);
 
   const handleSetLanguage = (lang: Locale) => {
     setLanguage(lang);
+    // Save the user's choice to localStorage for future visits
     localStorage.setItem('language', lang);
   };
 

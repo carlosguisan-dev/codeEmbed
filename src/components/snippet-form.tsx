@@ -12,7 +12,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { CodePreview } from './code-preview';
 import { useToast } from '@/hooks/use-toast';
@@ -70,7 +69,6 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
       isPublic: snippet?.isPublic ?? false,
   });
 
-  const [previewHeight, setPreviewHeight] = useState(300);
   
   const [charCount, setCharCount] = useState(formData.code.length);
   const [lineCount, setLineCount] = useState(formData.code.split('\n').length);
@@ -293,12 +291,8 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
                     <CardTitle className="font-headline">{t('live_preview_title')}</CardTitle>
                     <CardDescription>{t('live_preview_desc')}</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                     <div className="space-y-2">
-                        <Label>{t('preview_height_label')}</Label>
-                        <Slider defaultValue={[previewHeight]} max={800} min={150} step={10} onValueChange={(value) => setPreviewHeight(value[0])} />
-                    </div>
-                     <div style={{ height: `${previewHeight}px` }} className="overflow-auto rounded-lg border p-2 bg-muted/30">
+                <CardContent>
+                     <div className="overflow-auto rounded-lg border p-2 bg-muted/30">
                         <CodePreview
                             code={formData.code}
                             language={formData.language}

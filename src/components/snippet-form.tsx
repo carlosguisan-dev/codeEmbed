@@ -44,8 +44,6 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
       isPublic: snippet?.isPublic ?? false,
   });
 
-  const [errors, setErrors] = useState<{title?: string, code?: string}>({});
-
   const [previewHeight, setPreviewHeight] = useState(300);
   
   const [charCount, setCharCount] = useState(formData.code.length);
@@ -57,23 +55,8 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
   }, [formData.code]);
 
 
-  const validateAndSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Basic client-side validation
-    if (!formData.title || !formData.code) {
-        toast({
-            variant: 'destructive',
-            title: t('toast_error_title'),
-            description: 'Title and Code fields cannot be empty.',
-        });
-        const newErrors: {title?: string, code?: string} = {};
-        if (!formData.title) newErrors.title = 'Title is required';
-        if (!formData.code) newErrors.code = 'Code cannot be empty';
-        setErrors(newErrors);
-        return;
-    }
-    setErrors({});
 
     startTransition(async () => {
       const action = isEditMode ? updateSnippetAction : createSnippetAction;
@@ -84,10 +67,9 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
         toast({ title: isEditMode ? t('toast_snippet_updated_title') : t('toast_snippet_created_title'), description: formData.title });
         setSavedSnippet(result.data);
         if (!isEditMode) {
-            router.push(`/snippets/${result.data.id}/edit`, { scroll: false });
+            router.push(`/snippets/${result.data.id}/edit`);
         } else {
-            // In edit mode, maybe just show the share dialog
-            setEmbedDialogOpen(true);
+            router.refresh();
         }
       } else {
         toast({ variant: 'destructive', title: t('toast_error_title'), description: result.message });
@@ -110,14 +92,29 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
 
   return (
     <>
-    <form onSubmit={validateAndSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="flex justify-between items-start">
+            <h1 className="text-3xl font-bold font-headline">{isEditMode ? t('edit_snippet_title') : t('new_snippet_title')}</h1>
+            <div className="flex gap-2">
+                {isEditMode && (
+                  <Button type="button" variant="outline" onClick={() => setEmbedDialogOpen(true)} disabled={!savedSnippet}>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    {t('share_embed_button')}
+                  </Button>
+                )}
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                  {isEditMode ? t('save_changes_button') : t('create_snippet_button')}
+                </Button>
+            </div>
+        </div>
+
         <Card>
             <CardHeader>
                 <CardTitle className="font-headline">{t('title_label')}</CardTitle>
             </CardHeader>
             <CardContent>
                 <Input id="title" value={formData.title} onChange={handleChange} placeholder={t('title_placeholder')} />
-                {errors.title && <p className="text-sm text-destructive mt-1">{errors.title}</p>}
             </CardContent>
         </Card>
 
@@ -127,7 +124,6 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
             </CardHeader>
             <CardContent>
                 <Textarea id="code" value={formData.code} onChange={handleChange} className="font-code min-h-[400px]" placeholder="// Your code here" />
-                {errors.code && <p className="text-sm text-destructive mt-1">{errors.code}</p>}
                 <div className="text-xs text-muted-foreground mt-2 flex justify-end gap-4">
                     <span>{t('line_counter', { count: lineCount })}</span>
                     <span>{t('char_counter', { count: charCount })}</span>
@@ -229,18 +225,6 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
               </Card>
         </div>
       
-      <div className="flex justify-end gap-2">
-        {isEditMode && (
-          <Button type="button" variant="outline" onClick={() => setEmbedDialogOpen(true)} disabled={!savedSnippet}>
-            <Share2 className="mr-2 h-4 w-4" />
-            {t('share_embed_button')}
-          </Button>
-        )}
-        <Button type="submit" disabled={isPending}>
-          {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-          {isEditMode ? t('save_changes_button') : t('create_snippet_button')}
-        </Button>
-      </div>
     </form>
     <EmbedDialog snippet={savedSnippet} open={isEmbedDialogOpen} onOpenChange={setEmbedDialogOpen} />
     </>

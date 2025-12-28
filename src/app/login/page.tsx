@@ -159,8 +159,7 @@ function LoginPageContent() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="signup-password">Password</Label>
-                <Input
+                <Label htmlFor="signup-password">Password</Label>                <Input
                   id="signup-password"
                   type="password"
                   value={password}

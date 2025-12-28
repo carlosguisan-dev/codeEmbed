@@ -1,7 +1,7 @@
 'use client';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import { TranslationProvider } from '@/hooks/use-translation';
+import { TranslationProvider, useTranslation } from '@/hooks/use-translation';
 import React from 'react';
 import {
   SidebarProvider,
@@ -25,6 +25,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, isUserLoading } = useFirebase();
+  const { t } = useTranslation();
 
   const isPublicPage = pathname === '/';
   const isLoginPage = pathname === '/login';
@@ -84,18 +85,18 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Dashboard">
+              <SidebarMenuButton asChild tooltip={t('dashboard_title')}>
                 <Link href="/dashboard">
                   <LayoutDashboard />
-                  <span>Dashboard</span>
+                  <span>{t('dashboard_title')}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="New Snippet">
+                <SidebarMenuButton asChild tooltip={t('new_snippet_title')}>
                     <Link href="/snippets/new">
                         <Code/>
-                        <span>New Snippet</span>
+                        <span>{t('new_snippet_title')}</span>
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>

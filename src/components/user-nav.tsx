@@ -16,7 +16,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { LanguageSwitcher } from './language-switcher';
 import Link from 'next/link';
 
 export function UserNav() {
@@ -64,7 +63,6 @@ export function UserNav() {
 
   return (
     <div className="flex items-center gap-2">
-      <LanguageSwitcher />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">

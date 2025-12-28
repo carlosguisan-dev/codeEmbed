@@ -1,0 +1,170 @@
+/**
+ * Core Philosophy: This ruleset implements a dual-collection security model to
+ * enforce strict user ownership while allowing for public, read-only content. It
+ * segregates private and public data to create clear, performant, and secure
+ * access patterns.
+ *
+ * Data Structure:
+ * - /users/{userId}: Contains private user profile data, accessible only by the
+ *   authenticated owner.
+ * - /users/{userId}/snippets/{snippetId}: A subcollection for a user's private
+ *   code snippets, inheriting ownership from the parent user path.
+ * - /public_snippets/{snippetId}: A top-level collection for snippets that are
+ *   publicly readable by anyone, but writable only by their original author.
+ *
+ * Key Security Decisions:
+ * - Structural Segregation: Private snippets are stored under a user's data tree
+ *   (/users/{userId}/...) while public snippets are in a separate top-level
+ *   collection (/public_snippets). This is more secure and performant than using
+ *   a boolean flag (e.g., `isPublic`) within a single collection, especially for
+ *   list queries.
+ * - Deny by Default: Access is implicitly denied unless an 'allow' rule grants it.
+ * - No User Enumeration: Listing documents in the top-level '/users' collection
+ *   is explicitly forbidden to protect user privacy.
+ *
+ * Denormalization for Authorization:
+ * - Public Snippet Ownership: Each document in `/public_snippets` must contain a
+ *   `userId` field. This denormalized field is essential for enforcing that only
+ *   the original author can update or delete their public snippet, avoiding costly
+ *   `get()` calls or impossible cross-collection queries.
+ */
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --------------------------------------------------------------------
+    // Helper Functions
+    // --------------------------------------------------------------------
+
+    /**
+     * Checks if the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the authenticated user's UID matches the provided userId.
+     * This is the foundation of the user ownership model.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks for ownership on an existing document. Used for update and delete
+     * operations to prevent acting on non-existent data.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * Validates that a user profile document contains an 'id' field that
+     * matches the document's path ID upon creation.
+     */
+    function hasValidUserCreateData(userId) {
+      return request.resource.data.id == userId;
+    }
+
+    /**
+     * Enforces immutability of the user's ID field on update.
+     */
+    function hasImmutableUserId() {
+      return request.resource.data.id == resource.data.id;
+    }
+    
+    /**
+     * Validates that a private snippet contains a 'userId' field that
+     * matches the user's path ID upon creation.
+     */
+    function hasValidPrivateSnippetCreateData(userId) {
+      return request.resource.data.userId == userId;
+    }
+
+    /**
+     * Enforces immutability of the snippet's 'userId' field on update.
+     */
+    function hasImmutableSnippetOwner() {
+      return request.resource.data.userId == resource.data.userId;
+    }
+
+    /**
+     * Validates that a new public snippet correctly assigns the creator's
+     * UID to the 'userId' ownership field.
+     */
+    function isCreatingOwnPublicSnippet() {
+      return isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // --------------------------------------------------------------------
+    // Collection Rules
+    // --------------------------------------------------------------------
+
+    /**
+     * @description Manages user profile documents.
+     * @path /users/{userId}
+     * @allow (create) An authenticated user can create their own profile document.
+     *   - auth: { uid: 'user123' }
+     *   - path: /users/user123
+     *   - data: { id: 'user123', ... }
+     * @deny (list) No user can list all documents in the /users collection.
+     *   - auth: { uid: 'user123' }
+     * @deny (get) A user cannot read another user's profile.
+     *   - auth: { uid: 'user123' }
+     *   - path: /users/user456
+     * @principle Restricts access to a user's own data tree and prevents user enumeration.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && hasValidUserCreateData(userId);
+      allow update: if isExistingOwner(userId) && hasImmutableUserId();
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Manages a user's private code snippets.
+       * @path /users/{userId}/snippets/{snippetId}
+       * @allow (create) An authenticated user can create a snippet in their own space.
+       *   - auth: { uid: 'user123' }
+       *   - path: /users/user123/snippets/my-snippet
+       *   - data: { userId: 'user123', ... }
+       * @deny (update) A user cannot update a snippet belonging to another user.
+       *   - auth: { uid: 'user123' }
+       *   - path: /users/user456/snippets/their-snippet
+       * @principle Enforces strict ownership for all operations within a user's private data subcollection.
+       */
+      match /snippets/{snippetId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && hasValidPrivateSnippetCreateData(userId);
+        allow update: if isExistingOwner(userId) && hasImmutableSnippetOwner();
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    /**
+     * @description Manages publicly readable code snippets.
+     * @path /public_snippets/{snippetId}
+     * @allow (get) Any user, including unauthenticated ones, can read a public snippet.
+     *   - auth: null
+     *   - path: /public_snippets/some-public-id
+     * @allow (create) An authenticated user can create a public snippet if they set themselves as the owner.
+     *   - auth: { uid: 'user123' }
+     *   - path: /public_snippets/new-snippet
+     *   - data: { userId: 'user123', isPublic: true, ... }
+     * @deny (update) A user cannot update a public snippet they do not own.
+     *   - auth: { uid: 'user456' }
+     *   - path: /public_snippets/snippet-owned-by-user123
+     * @principle Implements a "Public Read, Owner Write" pattern, which requires a denormalized `userId` field on the document for write authorization.
+     */
+    match /public_snippets/{snippetId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isCreatingOwnPublicSnippet();
+      allow update: if isExistingOwner(resource.data.userId) && hasImmutableSnippetOwner();
+      allow delete: if isExistingOwner(resource.data.userId);
+    }
+  }
+}

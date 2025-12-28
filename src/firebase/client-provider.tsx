@@ -12,12 +12,13 @@ interface FirebaseClientProviderProps {
 export function FirebaseClientProvider({ children }: FirebaseClientProviderProps) {
   // Directly call initializeFirebase. It will either create the instance
   // or return the existing one, preventing re-initializations on re-renders.
-  const { firebaseApp, auth } = initializeFirebase();
+  const { firebaseApp, auth, firestore } = initializeFirebase();
 
   return (
     <FirebaseProvider
       firebaseApp={firebaseApp}
       auth={auth}
+      firestore={firestore}
     >
       {children}
     </FirebaseProvider>

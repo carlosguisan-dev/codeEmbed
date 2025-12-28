@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AppHeader } from '@/components/app-header';
 import Link from 'next/link';
-import { LayoutDashboard, Loader2 } from 'lucide-react';
+import { LayoutDashboard, Loader2, Code } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { FirebaseClientProvider, useFirebase } from '@/firebase';
 import { usePathname, useRouter } from 'next/navigation';
@@ -90,6 +90,14 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                   <span>Dashboard</span>
                 </Link>
               </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="New Snippet">
+                    <Link href="/snippets/new">
+                        <Code/>
+                        <span>New Snippet</span>
+                    </Link>
+                </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>

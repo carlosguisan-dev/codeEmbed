@@ -21,7 +21,7 @@ export function SnippetCard({ snippet }: { snippet: Snippet }) {
 
 
   return (
-    <Card className="flex flex-col justify-between transition-all hover:shadow-lg hover:-translate-y-1">
+    <Card className="flex flex-col justify-between transition-all hover:shadow-lg hover:-translate-y-1 h-full">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div className="space-y-1 pr-4">

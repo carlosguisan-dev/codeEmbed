@@ -1,7 +1,7 @@
 'use client';
 
 import { useFirebase, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
+import { collection } from 'firebase/firestore';
 import type { Snippet } from '@/lib/definitions';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
@@ -19,17 +19,14 @@ function DashboardLoading() {
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const { user, isUserLoading, firestore } = useFirebase();
+  const { isUserLoading, firestore } = useFirebase();
 
-  // Query for all public snippets, no longer filtered by user
+  // Basic query with no filters for debugging
   const snippetsQuery = useMemoFirebase(() => {
     if (!firestore) {
       return null;
     }
-    return query(
-      collection(firestore, 'snippets'),
-      where('isPublic', '==', true)
-    );
+    return collection(firestore, 'snippets');
   }, [firestore]);
 
   const { data: snippets, isLoading: areSnippetsLoading } =

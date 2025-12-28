@@ -14,12 +14,11 @@ service cloud.firestore {
       allow create: if isSignedIn();
     }
     
-    // Snippets can be read by anyone if they are public.
+    // Snippets can be read by anyone.
+    // This is insecure and for debugging purposes only.
     // They can only be created, updated, or deleted by the owner.
-    // Any user can list public snippets.
     match /snippets/{snippetId} {
-      allow get: if resource.data.isPublic == true || (isSignedIn() && resource.data.userId == request.auth.uid);
-      allow list: if request.query.get("isPublic") == "true";
+      allow get, list: if true;
       allow create: if isSignedIn();
       allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }

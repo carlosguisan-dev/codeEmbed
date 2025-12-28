@@ -1,11 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* config options here */
-  experimental: {
-    // This is required to make Next.js work with Cross-Origin requests in the development environment.
-    // The value is the domain of your Cloud Workstation.
-    allowedDevOrigins: ["6000-firebase-studio-1766943880856.cluster-hkcruqmgzbd2aqcdnktmz6k7ba.cloudworkstations.dev"]
-  },
   typescript: {
     ignoreBuildErrors: true,
   },

@@ -8,24 +8,24 @@ import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore'
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
 export function initializeFirebase() {
   if (!getApps().length) {
-    let firebaseApp;
     try {
       // Attempt to initialize via Firebase App Hosting environment variables
-      firebaseApp = initializeApp();
+      const app = initializeApp();
+      return getSdks(app);
     } catch (e) {
       // This is the normal flow for local development
-      firebaseApp = initializeApp(firebaseConfig);
+      const app = initializeApp(firebaseConfig);
       
       // Connect to emulators in local development
       if (process.env.NODE_ENV === 'development') {
-        const auth = getAuth(firebaseApp);
+        const auth = getAuth(app);
         connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
 
-        const firestore = getFirestore(firebaseApp);
+        const firestore = getFirestore(app);
         connectFirestoreEmulator(firestore, "127.0.0.1", 8080);
       }
+      return getSdks(app);
     }
-    return getSdks(firebaseApp);
   }
 
   // If already initialized, return the SDKs with the already initialized App

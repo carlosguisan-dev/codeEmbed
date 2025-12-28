@@ -9,7 +9,7 @@ import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 interface FirebaseProviderProps {
   children: ReactNode;
   firebaseApp: FirebaseApp;
-  firestore: Firestore;
+  firestore?: Firestore; // Firestore is optional now
   auth: Auth;
 }
 
@@ -34,7 +34,7 @@ export interface FirebaseContextState {
 // Return type for useFirebase()
 export interface FirebaseServicesAndUser {
   firebaseApp: FirebaseApp;
-  firestore: Firestore;
+  firestore: Firestore | null; // Can be null
   auth: Auth;
   user: User | null;
   isUserLoading: boolean;
@@ -93,7 +93,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   const contextValue = useMemo((): FirebaseContextState => {
     return {
       firebaseApp: firebaseApp,
-      firestore: firestore,
+      firestore: firestore || null,
       auth: auth,
       user: userAuthState.user,
       isUserLoading: userAuthState.isUserLoading,
@@ -125,7 +125,7 @@ const useFirebaseContext = () => {
 export const useFirebase = (): FirebaseServicesAndUser => {
   const context = useFirebaseContext();
 
-  if (!context.firebaseApp || !context.firestore || !context.auth) {
+  if (!context.firebaseApp || !context.auth) {
     throw new Error('Firebase core services not available. Check FirebaseProvider props.');
   }
 
@@ -147,9 +147,8 @@ export const useAuth = (): Auth => {
 };
 
 /** Hook to access Firestore instance. */
-export const useFirestore = (): Firestore => {
+export const useFirestore = (): Firestore | null => {
   const { firestore } = useFirebaseContext();
-  if (!firestore) throw new Error("Firestore service not available.");
   return firestore;
 };
 

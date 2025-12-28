@@ -3,13 +3,13 @@
 import { firebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+// import { getFirestore, Firestore } from 'firebase/firestore'; // Firestore is disabled
 
 // Define a type for the returned services for clarity.
 type FirebaseServices = {
   firebaseApp: FirebaseApp;
   auth: Auth;
-  firestore: Firestore;
+  // firestore: Firestore;
 };
 
 // This variable will hold the single instance of our Firebase services.
@@ -29,7 +29,7 @@ export function initializeFirebase(): FirebaseServices {
   firebaseServices = {
     firebaseApp: app,
     auth: getAuth(app),
-    firestore: getFirestore(app),
+    // firestore: getFirestore(app), // Firestore is disabled
   };
 
   return firebaseServices;

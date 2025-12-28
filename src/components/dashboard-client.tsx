@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import type { Snippet } from '@/lib/definitions';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { SnippetCard } from '@/components/snippet-card';
 import { Search } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from './ui/button';
@@ -90,9 +89,7 @@ export function DashboardClient({ snippets }: { snippets: Snippet[] }) {
 
       {filteredAndSortedSnippets.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredAndSortedSnippets.map(snippet => (
-            <SnippetCard key={snippet.id} snippet={snippet} />
-          ))}
+          {/* SnippetCard removed */}
         </div>
       ) : (
         <div className="text-center py-16 border-2 border-dashed rounded-lg">

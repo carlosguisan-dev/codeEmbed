@@ -1,62 +1,15 @@
 'use client';
-import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
-import { DashboardClient } from '@/components/dashboard-client';
-import type { Snippet } from '@/lib/definitions';
+import { useFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 function DashboardLoading() {
   return (
     <div className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <Skeleton className="h-9 w-48" />
-            <Skeleton className="h-10 w-36" />
-        </div>
-         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-        </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            <Skeleton className="h-40 w-full" />
-            <Skeleton className="h-40 w-full" />
-            <Skeleton className="h-40 w-full" />
-        </div>
+      <Skeleton className="h-9 w-48" />
+      <Skeleton className="h-40 w-full" />
     </div>
   );
-}
-
-function DashboardData({ userId }: { userId: string }) {
-  const { firestore } = useFirebase();
-
-  const snippetsQuery = useMemoFirebase(() => {
-    // This query will only be built when both firestore and userId are available.
-    if (!firestore || !userId) return null;
-    return query(
-      collection(firestore, 'snippets'),
-      where('userId', '==', userId)
-    );
-  }, [firestore, userId]);
-
-  const {
-    data: snippets,
-    isLoading,
-    error,
-  } = useCollection<Snippet>(snippetsQuery);
-
-  // Show loading skeleton while the query is running.
-  // The query will only run when snippetsQuery is not null.
-  if (isLoading) {
-    return <DashboardLoading />;
-  }
-
-  // The FirebaseErrorListener will catch and throw the error, so we don't need to render an error message here.
-  if (error) {
-    return null;
-  }
-
-  // Render the client component with the fetched data (or an empty array if there's none).
-  return <DashboardClient snippets={snippets || []} />;
 }
 
 export default function DashboardPage() {
@@ -73,6 +26,19 @@ export default function DashboardPage() {
     return <DashboardLoading />;
   }
 
-  // Once we have a user, render the DashboardData component with the user's ID.
-  return <DashboardData userId={user.uid} />;
+  // Once we have a user, render a simple welcome message to confirm login works.
+  return (
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold font-headline">Dashboard</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Login Successful</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Welcome, you are logged in as:</p>
+          <p className="font-mono mt-2 p-2 bg-muted rounded">{user.email}</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

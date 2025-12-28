@@ -9,6 +9,7 @@ export const LANGUAGES = [
   { value: 'go', label: 'Go' },
   { value: 'rust', label: 'Rust' },
   { value: 'json', label: 'JSON' },
+  { value: 'hubl', label: 'HubL' },
 ];
 
 export const THEMES = [

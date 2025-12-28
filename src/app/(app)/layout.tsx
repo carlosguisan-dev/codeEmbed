@@ -107,8 +107,6 @@ function ProtectedAppLayout({ children }: { children: React.ReactNode }) {
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     return (
-      <FirebaseClientProvider>
         <ProtectedAppLayout>{children}</ProtectedAppLayout>
-      </FirebaseClientProvider>
     );
   }

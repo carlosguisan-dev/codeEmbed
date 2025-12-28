@@ -18,28 +18,37 @@ export function DashboardClient({ snippets }: { snippets: Snippet[] }) {
   const [languageFilter, setLanguageFilter] = useState('all');
   const [sortOption, setSortOption] = useState<SortOption>('newest');
 
-  const languages = useMemo(() => ['all', ...Array.from(new Set(snippets.map(s => s.language)))], [snippets]);
+  const languages = useMemo(() => {
+    if (!snippets) return ['all'];
+    return ['all', ...Array.from(new Set(snippets.map(s => s.language)))];
+  }, [snippets]);
 
   const filteredAndSortedSnippets = useMemo(() => {
+    if (!snippets) return [];
+    
     return snippets
       .filter(snippet => 
         (languageFilter === 'all' || snippet.language === languageFilter) &&
-        (snippet.title.toLowerCase().includes(searchTerm.toLowerCase()) || snippet.description.toLowerCase().includes(searchTerm.toLowerCase()))
+        (snippet.title.toLowerCase().includes(searchTerm.toLowerCase()) || (snippet.description && snippet.description.toLowerCase().includes(searchTerm.toLowerCase())))
       )
       .sort((a, b) => {
         switch (sortOption) {
           case 'oldest':
-            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            return (a.createdAt ? new Date(a.createdAt).getTime() : 0) - (b.createdAt ? new Date(b.createdAt).getTime() : 0);
           case 'title-asc':
             return a.title.localeCompare(b.title);
           case 'title-desc':
             return b.title.localeCompare(a.title);
           case 'newest':
           default:
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            return (b.createdAt ? new Date(b.createdAt).getTime() : 0) - (a.createdAt ? new Date(a.createdAt).getTime() : 0);
         }
       });
   }, [snippets, searchTerm, languageFilter, sortOption]);
+
+  if (!snippets) {
+    return null; // Or a loading state if you prefer
+  }
 
   return (
     <div className="space-y-6">

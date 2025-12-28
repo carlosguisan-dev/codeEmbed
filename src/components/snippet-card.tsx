@@ -22,8 +22,10 @@ export function SnippetCard({ snippet }: { snippet: Snippet }) {
   const [formattedDate, setFormattedDate] = useState('');
 
   useEffect(() => {
-    setFormattedDate(new Date(snippet.createdAt).toLocaleDateString());
-  }, [snippet.createdAt]);
+    if (snippet && snippet.createdAt) {
+        setFormattedDate(new Date(snippet.createdAt).toLocaleDateString());
+    }
+  }, [snippet]);
 
   const handleDelete = () => {
     if (!user) {

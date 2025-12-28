@@ -16,10 +16,10 @@ service cloud.firestore {
     
     // Snippets can be read by anyone if they are public.
     // They can only be created, updated, or deleted by the owner.
-    // Users can list their own snippets.
+    // Any user can list public snippets.
     match /snippets/{snippetId} {
       allow get: if resource.data.isPublic == true || (isSignedIn() && resource.data.userId == request.auth.uid);
-      allow list: if isSignedIn() && request.query.get("userId") == request.auth.uid;
+      allow list: if request.query.get("isPublic") == "true";
       allow create: if isSignedIn();
       allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }

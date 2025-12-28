@@ -21,20 +21,17 @@ export default function DashboardPage() {
   const { t } = useTranslation();
   const { user, isUserLoading, firestore } = useFirebase();
 
-  // This is the safe query.
-  // It will be `null` until `firestore` and `user.uid` are both available.
+  // Query for all public snippets, no longer filtered by user
   const snippetsQuery = useMemoFirebase(() => {
-    if (!firestore || !user?.uid) {
+    if (!firestore) {
       return null;
     }
     return query(
       collection(firestore, 'snippets'),
-      where('userId', '==', user.uid)
+      where('isPublic', '==', true)
     );
-  }, [firestore, user?.uid]); // Dependencies are clear
+  }, [firestore]);
 
-  // `useCollection` is designed to handle a `null` query gracefully.
-  // It will wait until the query is valid before executing.
   const { data: snippets, isLoading: areSnippetsLoading } =
     useCollection<Snippet>(snippetsQuery);
 
@@ -43,7 +40,6 @@ export default function DashboardPage() {
     return <DashboardLoading />;
   }
 
-  // Once loading is complete, we can be sure we have the user's data (or an empty array).
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

@@ -30,7 +30,8 @@ function DashboardData({ userId }: { userId: string }) {
   const { firestore } = useFirebase();
 
   const snippetsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    // This query will only be built when both firestore and userId are available.
+    if (!firestore || !userId) return null;
     return query(
       collection(firestore, 'snippets'),
       where('userId', '==', userId)
@@ -43,25 +44,34 @@ function DashboardData({ userId }: { userId: string }) {
     error,
   } = useCollection<Snippet>(snippetsQuery);
 
+  // Show loading skeleton while the query is running or if the query itself is not ready yet.
   if (isLoading || (!snippets && !error)) {
     return <DashboardLoading />;
   }
 
+  // The FirebaseErrorListener will catch and throw the error, so we don't need to render an error message here.
   if (error) {
-    // The error is thrown by the useCollection hook via the FirebaseErrorListener
-    // so we don't need to render anything here.
     return null;
   }
 
+  // Render the client component with the fetched data.
   return <DashboardClient snippets={snippets || []} />;
 }
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useFirebase();
 
-  if (isUserLoading || !user) {
+  // Show the loading skeleton while the user authentication state is being determined.
+  if (isUserLoading) {
     return <DashboardLoading />;
   }
 
+  // If there's no user, we can show a message or redirect, but for now, we'll show the loading state
+  // as the layout should handle the redirect to login.
+  if (!user) {
+    return <DashboardLoading />;
+  }
+
+  // Once we have a user, render the DashboardData component with the user's ID.
   return <DashboardData userId={user.uid} />;
 }

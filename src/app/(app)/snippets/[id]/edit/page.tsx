@@ -12,12 +12,11 @@ export default function EditSnippetPage({
 }: {
   params: { id: string };
 }) {
-  const id = params.id;
   const { firestore } = useFirebase();
 
   const snippetRef = useMemoFirebase(
-    () => (firestore ? doc(firestore, 'snippets', id) : null),
-    [firestore, id]
+    () => (firestore ? doc(firestore, 'snippets', params.id) : null),
+    [firestore, params.id]
   );
 
   const { data: snippet, isLoading, error } = useDoc<Snippet>(snippetRef);

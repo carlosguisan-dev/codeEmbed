@@ -9,7 +9,6 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
-import { updateSnippetViewCount } from '@/lib/actions';
 import { FirebaseClientProvider, useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import type { Snippet } from '@/lib/definitions';
@@ -84,10 +83,9 @@ function EmbedPageContent({ id }: { id: string }) {
 
 
 export default function EmbedPage({ params }: { params: { id: string } }) {
-    const id = params.id;
     return (
         <FirebaseClientProvider>
-            <EmbedPageContent id={id} />
+            <EmbedPageContent id={params.id} />
         </FirebaseClientProvider>
     )
 }

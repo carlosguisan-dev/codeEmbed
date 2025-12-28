@@ -286,22 +286,6 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
         </div>
 
         <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="font-headline">{t('live_preview_title')}</CardTitle>
-                    <CardDescription>{t('live_preview_desc')}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                     <div className="overflow-auto rounded-lg border p-2 bg-muted/30">
-                        <CodePreview
-                            code={formData.code}
-                            language={formData.language}
-                            theme={formData.theme as 'light' | 'dark'}
-                            showLineNumbers={formData.lineNumbers}
-                        />
-                    </div>
-                </CardContent>
-              </Card>
                <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">{t('theme_previews_title')}</CardTitle>

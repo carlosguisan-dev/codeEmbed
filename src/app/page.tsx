@@ -10,6 +10,14 @@ export default function LandingPage() {
   const { user, isUserLoading } = useFirebase();
   const router = useRouter();
 
+  const codeExample = `
+<span class="text-purple-400">function</span> <span class="text-blue-400">helloWorld</span>() {
+  <span class="text-purple-400">console</span>.<span class="text-yellow-400">log</span>(<span class="text-green-400">"Hello, World!"</span>);
+}
+
+<span class="text-blue-400">helloWorld</span>();
+  `.trim();
+
   if (isUserLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -64,12 +72,7 @@ export default function LandingPage() {
                           <span className="text-xs text-foreground/50">code-embed.app</span>
                       </div>
                       <pre className="text-sm text-foreground/90 whitespace-pre-wrap break-words">
-<code><span className="text-purple-400">function</span> <span className="text-blue-400">helloWorld</span>() {'{'}
-  <span className="text-purple-400">console</span>.<span className="text-yellow-400">log</span>(<span className="text-green-400">"Hello, World!"</span>);
-{'}'}
-
-<span className="text-blue-400">helloWorld</span>();
-</code>
+                        <code dangerouslySetInnerHTML={{ __html: codeExample }} />
                       </pre>
                   </div>
               </div>

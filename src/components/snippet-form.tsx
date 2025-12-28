@@ -96,131 +96,133 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
   return (
     <>
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Editor Side */}
-        <div className="space-y-6 lg:col-span-2">
-          <Card>
+        <Card>
             <CardHeader>
-              <CardTitle className="font-headline">{t('editor_title')}</CardTitle>
-              <CardDescription>{t('editor_desc')}</CardDescription>
+                <CardTitle className="font-headline">{t('title_label')}</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="title">{t('title_label')}</Label>
+            <CardContent>
                 <Input id="title" {...register('title')} placeholder={t('title_placeholder')} />
                 {errors.title && <p className="text-sm text-destructive mt-1">{errors.title.message}</p>}
-              </div>
-              <div>
-                <Label htmlFor="description">{t('description_label')}</Label>
-                <Textarea id="description" {...register('description')} placeholder={t('description_placeholder')} />
-                {errors.description && <p className="text-sm text-destructive mt-1">{errors.description.message}</p>}
-              </div>
-              <div>
-                <Label htmlFor="code">{t('code_label')}</Label>
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline">{t('code_label')}</CardTitle>
+            </CardHeader>
+            <CardContent>
                 <Textarea id="code" {...register('code')} className="font-code min-h-[400px]" placeholder="// Your code here" />
                 {errors.code && <p className="text-sm text-destructive mt-1">{errors.code.message}</p>}
                 <div className="text-xs text-muted-foreground mt-2 flex justify-end gap-4">
                     <span>{t('line_counter', { count: lineCount })}</span>
                     <span>{t('char_counter', { count: charCount })}</span>
                 </div>
-              </div>
             </CardContent>
-          </Card>
+        </Card>
 
-          <Card>
-            <CardHeader>
-                <CardTitle className="font-headline">{t('settings_title')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">{t('settings_title')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <Label>{t('language_label')}</Label>
+                            <Controller name="language" control={control} render={({ field }) => (
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <SelectTrigger><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        {LANGUAGES.map(lang => <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            )} />
+                        </div>
+                         <div>
+                            <Label>{t('theme_label')}</Label>
+                            <Controller name="theme" control={control} render={({ field }) => (
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <SelectTrigger><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        {THEMES.map(theme => <SelectItem key={theme.value} value={theme.value}>{theme.label}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            )} />
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="lineNumbers" className="flex flex-col">
+                            <span>{t('line_numbers_label')}</span>
+                            <span className="font-normal text-sm text-muted-foreground">{t('line_numbers_desc')}</span>
+                        </Label>
+                        <Controller name="lineNumbers" control={control} render={({ field }) => (
+                            <Switch id="lineNumbers" checked={field.value} onCheckedChange={field.onChange} />
+                        )} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="isPublic" className="flex flex-col">
+                            <span>{t('public_access_label')}</span>
+                            <span className="font-normal text-sm text-muted-foreground">{t('public_access_desc')}</span>
+                        </Label>
+                        <Controller name="isPublic" control={control} render={({ field }) => (
+                             <Switch id="isPublic" checked={field.value} onCheckedChange={field.onChange} />
+                        )} />
+                    </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">{t('description_label')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Textarea id="description" {...register('description')} placeholder={t('description_placeholder')} className="min-h-[244px]" />
+                    {errors.description && <p className="text-sm text-destructive mt-1">{errors.description.message}</p>}
+                </CardContent>
+            </Card>
+        </div>
+
+        <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">{t('live_preview_title')}</CardTitle>
+                    <CardDescription>{t('live_preview_desc')}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                     <div className="space-y-2">
+                        <Label>{t('preview_height_label')}</Label>
+                        <Slider defaultValue={[previewHeight]} max={800} min={150} step={10} onValueChange={(value) => setPreviewHeight(value[0])} />
+                    </div>
+                     <div style={{ height: `${previewHeight}px` }} className="overflow-auto rounded-lg border p-2 bg-muted/30">
+                        <CodePreview
+                            code={formData.code}
+                            language={formData.language}
+                            theme={formData.theme}
+                            showLineNumbers={formData.lineNumbers}
+                        />
+                    </div>
+                </CardContent>
+              </Card>
+               <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">{t('theme_previews_title')}</CardTitle>
+                </CardHeader>
+                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <Label>{t('language_label')}</Label>
-                        <Controller name="language" control={control} render={({ field }) => (
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    {LANGUAGES.map(lang => <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        )} />
+                        <Label className="text-muted-foreground">{t('light_theme_preview')}</Label>
+                        <div className="mt-2 rounded-lg border p-2 bg-muted/30 h-48 overflow-auto">
+                            <CodePreview code={formData.code} language={formData.language} theme="light" showLineNumbers={formData.lineNumbers} />
+                        </div>
                     </div>
-                     <div>
-                        <Label>{t('theme_label')}</Label>
-                        <Controller name="theme" control={control} render={({ field }) => (
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    {THEMES.map(theme => <SelectItem key={theme.value} value={theme.value}>{theme.label}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                        )} />
+                    <div>
+                        <Label className="text-muted-foreground">{t('dark_theme_preview')}</Label>
+                        <div className="mt-2 rounded-lg border p-2 bg-muted/30 h-48 overflow-auto">
+                            <CodePreview code={formData.code} language={formData.language} theme="dark" showLineNumbers={formData.lineNumbers} />
+                        </div>
                     </div>
-                </div>
-                <div className="flex items-center justify-between">
-                    <Label htmlFor="lineNumbers" className="flex flex-col">
-                        <span>{t('line_numbers_label')}</span>
-                        <span className="font-normal text-sm text-muted-foreground">{t('line_numbers_desc')}</span>
-                    </Label>
-                    <Controller name="lineNumbers" control={control} render={({ field }) => (
-                        <Switch id="lineNumbers" checked={field.value} onCheckedChange={field.onChange} />
-                    )} />
-                </div>
-                <div className="flex items-center justify-between">
-                    <Label htmlFor="isPublic" className="flex flex-col">
-                        <span>{t('public_access_label')}</span>
-                        <span className="font-normal text-sm text-muted-foreground">{t('public_access_desc')}</span>
-                    </Label>
-                    <Controller name="isPublic" control={control} render={({ field }) => (
-                         <Switch id="isPublic" checked={field.value} onCheckedChange={field.onChange} />
-                    )} />
-                </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
         </div>
-
-        {/* Preview Side */}
-        <div className="space-y-6 lg:col-span-1">
-          <Card>
-            <CardHeader>
-                <CardTitle className="font-headline">{t('live_preview_title')}</CardTitle>
-                <CardDescription>{t('live_preview_desc')}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="space-y-2">
-                    <Label>{t('preview_height_label')}</Label>
-                    <Slider defaultValue={[previewHeight]} max={800} min={150} step={10} onValueChange={(value) => setPreviewHeight(value[0])} />
-                </div>
-                 <div style={{ height: `${previewHeight}px` }} className="overflow-auto rounded-lg border p-2 bg-muted/30">
-                    <CodePreview
-                        code={formData.code}
-                        language={formData.language}
-                        theme={formData.theme}
-                        showLineNumbers={formData.lineNumbers}
-                    />
-                </div>
-            </CardContent>
-          </Card>
-           <Card>
-            <CardHeader>
-                <CardTitle className="font-headline">{t('theme_previews_title')}</CardTitle>
-            </CardHeader>
-             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:grid-cols-1">
-                <div>
-                    <Label className="text-muted-foreground">{t('light_theme_preview')}</Label>
-                    <div className="mt-2 rounded-lg border p-2 bg-muted/30 h-48 overflow-auto">
-                        <CodePreview code={formData.code} language={formData.language} theme="light" showLineNumbers={formData.lineNumbers} />
-                    </div>
-                </div>
-                <div>
-                    <Label className="text-muted-foreground">{t('dark_theme_preview')}</Label>
-                    <div className="mt-2 rounded-lg border p-2 bg-muted/30 h-48 overflow-auto">
-                        <CodePreview code={formData.code} language={formData.language} theme="dark" showLineNumbers={formData.lineNumbers} />
-                    </div>
-                </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      
       <div className="flex justify-end gap-2">
         {isEditMode && (
           <Button type="button" variant="outline" onClick={() => setEmbedDialogOpen(true)} disabled={!savedSnippet}>

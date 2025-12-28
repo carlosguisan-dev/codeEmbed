@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { Save, Loader2, Share2 } from 'lucide-react';
 import { EmbedDialog } from './embed-dialog';
+import { useFirebase } from '@/firebase';
 
 
 interface SnippetFormProps {
@@ -28,6 +29,7 @@ interface SnippetFormProps {
 export function SnippetForm({ snippet }: SnippetFormProps) {
   const isEditMode = !!snippet;
   const router = useRouter();
+  const { user } = useFirebase();
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -57,10 +59,17 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+        toast({ variant: 'destructive', title: t('toast_error_title'), description: "You must be logged in to perform this action." });
+        return;
+    }
 
     startTransition(async () => {
       const action = isEditMode ? updateSnippetAction : createSnippetAction;
-      const payload = isEditMode ? { id: snippet.id, ...formData } : formData;
+      const payload = isEditMode 
+        ? { formData: { id: snippet.id, ...formData }, userId: user.uid }
+        : { formData, userId: user.uid };
+      
       const result = await action(payload as any);
 
       if (result.success && result.data) {
@@ -102,7 +111,7 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
                     {t('share_embed_button')}
                   </Button>
                 )}
-                <Button type="submit" disabled={isPending}>
+                <Button type="submit" disabled={isPending || !user}>
                   {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                   {isEditMode ? t('save_changes_button') : t('create_snippet_button')}
                 </Button>

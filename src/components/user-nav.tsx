@@ -29,14 +29,6 @@ export function UserNav() {
 
     try {
       await auth.signOut();
-
-      const response = await fetch('/api/auth/session', {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete session cookie.');
-      }
       
       // Redirect to login page after successful logout on all levels
       router.push('/login');

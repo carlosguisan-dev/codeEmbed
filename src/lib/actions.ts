@@ -24,7 +24,12 @@ type ActionResponse = {
   data?: Snippet;
 };
 
-async function getUserId(): Promise<string | null> {
+// This function can be used in Server Actions to get the UID of the logged-in user.
+// It relies on the session cookie being set, which is no longer the case with the new auth flow.
+// We will need to adapt Server Actions to receive the userId from the client if needed,
+// or use a different method to authenticate server-side requests.
+// For now, let's assume we will pass the UID from the client.
+async function getUserIdFromSession(): Promise<string | null> {
     try {
         const sessionCookie = cookies().get('session')?.value;
         if (!sessionCookie) return null;
@@ -36,16 +41,21 @@ async function getUserId(): Promise<string | null> {
     }
 }
 
-export async function createSnippetAction(formData: unknown): Promise<ActionResponse> {
+// TODO: All server actions need to be re-evaluated.
+// We'll need a way to get the authenticated user on the server.
+// A common pattern is to have the client send the user's ID token with the request.
+// For now, let's modify the actions to require the userId to be passed in.
+
+export async function createSnippetAction(payload: { formData: unknown, userId: string }): Promise<ActionResponse> {
+  const { formData, userId } = payload;
+  if (!userId) {
+    return { success: false, message: 'User not authenticated.' };
+  }
+
   const validatedFields = snippetSchema.safeParse(formData);
 
   if (!validatedFields.success) {
     return { success: false, message: 'Invalid form data.' };
-  }
-
-  const userId = await getUserId();
-  if (!userId) {
-    return { success: false, message: 'User not authenticated.' };
   }
   
   const { db } = getFirebaseAdmin();
@@ -75,7 +85,12 @@ export async function createSnippetAction(formData: unknown): Promise<ActionResp
   }
 }
 
-export async function updateSnippetAction(formData: unknown): Promise<ActionResponse> {
+export async function updateSnippetAction(payload: { formData: unknown, userId: string }): Promise<ActionResponse> {
+  const { formData, userId } = payload;
+  if (!userId) {
+    return { success: false, message: 'User not authenticated.' };
+  }
+
   const updateSchema = snippetSchema.extend({
       id: z.string(),
   });
@@ -85,16 +100,10 @@ export async function updateSnippetAction(formData: unknown): Promise<ActionResp
     return { success: false, message: 'Invalid form data for update.' };
   }
 
-  const userId = await getUserId();
-  if (!userId) {
-    return { success: false, message: 'User not authenticated.' };
-  }
-
   const { id, ...data } = validatedFields.data;
   const { db } = getFirebaseAdmin();
   const snippetRef = doc(db, 'snippets', id);
 
-  // Optional: Check if user owns the snippet before updating
   const docSnap = await getDoc(snippetRef);
   if (!docSnap.exists() || docSnap.data().userId !== userId) {
       return { success: false, message: 'Snippet not found or you do not have permission to edit it.' };
@@ -123,8 +132,8 @@ export async function updateSnippetAction(formData: unknown): Promise<ActionResp
   }
 }
 
-export async function deleteSnippetAction(id: string): Promise<ActionResponse> {
-    const userId = await getUserId();
+export async function deleteSnippetAction(payload: { id: string, userId: string }): Promise<ActionResponse> {
+    const { id, userId } = payload;
     if (!userId) {
         return { success: false, message: 'User not authenticated.' };
     }
@@ -146,8 +155,8 @@ export async function deleteSnippetAction(id: string): Promise<ActionResponse> {
     }
 }
 
-export async function duplicateSnippetAction(id: string): Promise<ActionResponse> {
-    const userId = await getUserId();
+export async function duplicateSnippetAction(payload: { id: string, userId: string }): Promise<ActionResponse> {
+    const { id, userId } = payload;
     if (!userId) {
         return { success: false, message: 'User not authenticated.' };
     }
@@ -159,6 +168,9 @@ export async function duplicateSnippetAction(id: string): Promise<ActionResponse
         const docSnap = await getDoc(originalSnippetRef);
         if (!docSnap.exists()) {
             return { success: false, message: 'Original snippet not found.' };
+        }
+        if (docSnap.data().userId !== userId) {
+             return { success: false, message: 'You do not have permission to duplicate this snippet.' };
         }
 
         const originalData = docSnap.data();

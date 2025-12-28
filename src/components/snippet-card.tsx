@@ -11,9 +11,11 @@ import { useTransition, useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { EmbedDialog } from './embed-dialog';
+import { useFirebase } from '@/firebase';
 
 export function SnippetCard({ snippet }: { snippet: Snippet }) {
   const { t } = useTranslation();
+  const { user } = useFirebase();
   let [isPending, startTransition] = useTransition();
   const [isEmbedDialogOpen, setEmbedDialogOpen] = useState(false);
   const { toast } = useToast();
@@ -24,8 +26,12 @@ export function SnippetCard({ snippet }: { snippet: Snippet }) {
   }, [snippet.createdAt]);
 
   const handleDelete = () => {
+    if (!user) {
+        toast({ variant: 'destructive', title: t('toast_error_title'), description: "You must be logged in." });
+        return;
+    }
     startTransition(async () => {
-      const result = await deleteSnippetAction(snippet.id);
+      const result = await deleteSnippetAction({ id: snippet.id, userId: user.uid });
       if (result.success) {
         toast({ title: t('toast_snippet_deleted_title'), description: t('toast_snippet_deleted_desc') });
       } else {
@@ -35,8 +41,12 @@ export function SnippetCard({ snippet }: { snippet: Snippet }) {
   };
 
   const handleDuplicate = () => {
+    if (!user) {
+        toast({ variant: 'destructive', title: t('toast_error_title'), description: "You must be logged in." });
+        return;
+    }
     startTransition(async () => {
-        const result = await duplicateSnippetAction(snippet.id);
+        const result = await duplicateSnippetAction({ id: snippet.id, userId: user.uid });
         if (result.success) {
           toast({ title: t('toast_snippet_duplicated_title'), description: t('toast_snippet_duplicated_desc') });
         } else {

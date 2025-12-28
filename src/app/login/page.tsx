@@ -43,26 +43,11 @@ function LoginPageContent() {
     setError(null);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      await signInWithEmailAndPassword(
         auth,
         email,
         password
       );
-
-      // It's recommended to force token refresh to get the latest token.
-      const idToken = await userCredential.user.getIdToken(true);
-
-      // Send token to server to create session cookie
-      const response = await fetch('/api/auth/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create session.');
-      }
       
       // onAuthStateChanged in FirebaseProvider will handle the user state update.
       // Redirect will be handled by the layout.

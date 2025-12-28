@@ -7,17 +7,21 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { MoreVertical, Edit, Copy, Trash2, Globe, Lock, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { deleteSnippetAction, duplicateSnippetAction } from '@/lib/actions';
-import { useTransition } from 'react';
+import { useTransition, useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { EmbedDialog } from './embed-dialog';
-import { useState } from 'react';
 
 export function SnippetCard({ snippet }: { snippet: Snippet }) {
   const { t } = useTranslation();
   let [isPending, startTransition] = useTransition();
   const [isEmbedDialogOpen, setEmbedDialogOpen] = useState(false);
   const { toast } = useToast();
+  const [formattedDate, setFormattedDate] = useState('');
+
+  useEffect(() => {
+    setFormattedDate(new Date(snippet.createdAt).toLocaleDateString());
+  }, [snippet.createdAt]);
 
   const handleDelete = () => {
     startTransition(async () => {
@@ -40,8 +44,6 @@ export function SnippetCard({ snippet }: { snippet: Snippet }) {
         }
       });
   }
-
-  const formattedDate = new Date(snippet.createdAt).toLocaleDateString();
 
   return (
     <>

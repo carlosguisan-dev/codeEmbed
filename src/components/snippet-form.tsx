@@ -2,9 +2,9 @@
 
 import type { Snippet } from '@/lib/definitions';
 import { LANGUAGES, THEMES } from '@/lib/data';
-import { createSnippetAction, updateSnippetAction } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
 import { useTransition, useState, useEffect } from 'react';
+import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,16 +20,29 @@ import { useTranslation } from '@/hooks/use-translation';
 import { Save, Loader2, Share2 } from 'lucide-react';
 import { EmbedDialog } from './embed-dialog';
 import { useFirebase } from '@/firebase';
+import { setDocumentNonBlocking, addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { collection, doc, serverTimestamp } from 'firebase/firestore';
 
 
 interface SnippetFormProps {
   snippet?: Snippet;
 }
 
+const snippetSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(100),
+  description: z.string().max(500).optional(),
+  code: z.string().min(1, 'Code cannot be empty'),
+  language: z.string(),
+  theme: z.enum(['light', 'dark']),
+  lineNumbers: z.boolean(),
+  isPublic: z.boolean(),
+});
+
+
 export function SnippetForm({ snippet }: SnippetFormProps) {
   const isEditMode = !!snippet;
   const router = useRouter();
-  const { user } = useFirebase();
+  const { user, firestore } = useFirebase();
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -59,29 +72,56 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
+    if (!user || !firestore) {
         toast({ variant: 'destructive', title: t('toast_error_title'), description: "You must be logged in to perform this action." });
         return;
     }
 
-    startTransition(async () => {
-      const action = isEditMode ? updateSnippetAction : createSnippetAction;
-      const payload = isEditMode 
-        ? { formData: { id: snippet.id, ...formData }, userId: user.uid }
-        : { formData, userId: user.uid };
-      
-      const result = await action(payload as any);
+    const validatedFields = snippetSchema.safeParse(formData);
+    if (!validatedFields.success) {
+      toast({ variant: 'destructive', title: t('toast_error_title'), description: validatedFields.error.errors.map(e => e.message).join(', ') });
+      return;
+    }
 
-      if (result.success && result.data) {
-        toast({ title: isEditMode ? t('toast_snippet_updated_title') : t('toast_snippet_created_title'), description: formData.title });
-        setSavedSnippet(result.data);
-        if (!isEditMode) {
-            router.push(`/snippets/${result.data.id}/edit`);
-        } else {
-            router.refresh();
+    startTransition(async () => {
+      if (isEditMode && snippet) {
+        // Update existing snippet
+        const snippetRef = doc(firestore, 'snippets', snippet.id);
+        const dataToUpdate = {
+          ...validatedFields.data,
+          updatedAt: serverTimestamp(),
         }
+        setDocumentNonBlocking(snippetRef, dataToUpdate, { merge: true });
+
+        const updatedSnippetForDialog: Snippet = {
+            ...snippet,
+            ...dataToUpdate,
+            updatedAt: new Date().toISOString()
+        }
+        setSavedSnippet(updatedSnippetForDialog);
+        toast({ title: t('toast_snippet_updated_title'), description: formData.title });
+        router.refresh();
+
       } else {
-        toast({ variant: 'destructive', title: t('toast_error_title'), description: result.message });
+        // Create new snippet
+        const collectionRef = collection(firestore, 'snippets');
+        const dataToCreate = {
+            ...validatedFields.data,
+            userId: user.uid,
+            viewCount: 0,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+        }
+        const newDocRef = await addDocumentNonBlocking(collectionRef, dataToCreate);
+        
+        toast({ title: t('toast_snippet_created_title'), description: formData.title });
+
+        if (newDocRef?.id) {
+           router.push(`/snippets/${newDocRef.id}/edit`);
+        } else {
+            // This case should be rare, but good to handle
+            router.push('/dashboard');
+        }
       }
     });
   };

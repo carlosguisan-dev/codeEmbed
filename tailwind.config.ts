@@ -10,9 +10,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['"Work Sans"', 'sans-serif'],
-        headline: ['"Work Sans"', 'sans-serif'],
-        code: ['"Source Code Pro"', 'monospace'],
+        body: ['sans-serif'],
+        headline: ['sans-serif'],
+        code: ['monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',

@@ -58,24 +58,26 @@ export function useCollection<T = any>(
   type StateDataType = ResultItemType[] | null;
 
   const [data, setData] = useState<StateDataType>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true); // Start as true
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
+    // If the query/ref is not ready, stop loading and clear data/errors.
+    if (!memoizedTargetRefOrQuery) {
+      setData(null);
+      setIsLoading(false); // Set to false because we are not actively fetching.
+      setError(null);
+      return;
+    }
+    
     if (memoizedTargetRefOrQuery && !(memoizedTargetRefOrQuery as any).__memo) {
       const errorMessage = `useCollection received a query or reference that was not memoized with useMemoFirebase. This can lead to infinite loops and excessive Firestore reads. Please wrap the query/reference creation in useMemoFirebase.`;
       console.error(errorMessage);
       const devError = new Error(errorMessage);
       setError(devError);
+      setIsLoading(false);
       // In a real app, you might want to throw this error in development
       // to make it impossible to ignore.
-      return;
-    }
-
-    if (!memoizedTargetRefOrQuery) {
-      setData(null);
-      setIsLoading(false);
-      setError(null);
       return;
     }
 

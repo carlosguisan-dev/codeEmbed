@@ -44,8 +44,9 @@ function DashboardData({ userId }: { userId: string }) {
     error,
   } = useCollection<Snippet>(snippetsQuery);
 
-  // Show loading skeleton while the query is running or if the query itself is not ready yet.
-  if (isLoading || (!snippets && !error)) {
+  // Show loading skeleton while the query is running.
+  // The query will only run when snippetsQuery is not null.
+  if (isLoading) {
     return <DashboardLoading />;
   }
 
@@ -54,7 +55,7 @@ function DashboardData({ userId }: { userId: string }) {
     return null;
   }
 
-  // Render the client component with the fetched data.
+  // Render the client component with the fetched data (or an empty array if there's none).
   return <DashboardClient snippets={snippets || []} />;
 }
 

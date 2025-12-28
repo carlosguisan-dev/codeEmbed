@@ -20,8 +20,8 @@ import { useTranslation } from '@/hooks/use-translation';
 import { Save, Loader2, Share2, Trash2 } from 'lucide-react';
 import { EmbedDialog } from './embed-dialog';
 import { useFirebase } from '@/firebase';
-import { setDocumentNonBlocking, addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import { setDocumentNonBlocking, addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { collection, doc, serverTimestamp, deleteDoc } from 'firebase/firestore';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -140,14 +140,20 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
   const handleDelete = () => {
     if (!user || !firestore || !snippet) return;
 
-    startTransition(() => {
+    startTransition(async () => {
         const snippetRef = doc(firestore, 'snippets', snippet.id);
-        deleteDocumentNonBlocking(snippetRef);
+        
+        // Use await here to ensure deletion completes before redirection
+        await deleteDoc(snippetRef);
+
         toast({ 
             title: t('toast_snippet_deleted_title'), 
             description: t('toast_snippet_deleted_desc', { title: snippet.title })
         });
+        
+        // This will now reliably happen after the deletion is complete
         router.push('/dashboard');
+        router.refresh();
     });
   }
 
@@ -328,3 +334,5 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
     </>
   );
 }
+
+    

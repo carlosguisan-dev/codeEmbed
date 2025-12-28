@@ -29,8 +29,8 @@ service cloud.firestore {
       // Users can read their own private snippets
       allow get: if isOwner(resource.data.userId) && resource.data.isPublic == false;
 
-      // Users can query their own snippets
-      allow list: if isSignedIn() && request.query.resource.data.userId == request.auth.uid;
+      // Users can query their own snippets by userId
+      allow list: if isSignedIn() && request.query.where.userId == request.auth.uid;
       
       // Allow creating a snippet if the user is the owner
       allow create: if isSignedIn() && isNewSnippetOwner(request.auth.uid);

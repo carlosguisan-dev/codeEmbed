@@ -17,10 +17,12 @@ import type { Snippet } from '@/lib/definitions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect } from 'react';
 import { Logo } from '@/components/icons';
+import { useTranslation } from '@/hooks/use-translation';
 
 
 function EmbedPageContent({ id }: { id: string }) {
   const { firestore } = useFirebase();
+  const { t } = useTranslation();
   const snippetRef = useMemoFirebase(
     () => (firestore ? doc(firestore, 'snippets', id) : null),
     [firestore, id]
@@ -101,7 +103,7 @@ function EmbedPageContent({ id }: { id: string }) {
         </CardContent>
         <CardFooter className="bg-muted/50 px-4 py-2">
             <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
-                <span>Powered by</span>
+                <span>{t('powered_by')}</span>
                 <Logo width={100} height={25} />
             </Link>
         </CardFooter>

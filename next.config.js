@@ -43,6 +43,9 @@ const nextConfig = {
   devIndicators: {
     buildActivity: true,
     buildActivityPosition: 'bottom-right',
+    allowedDevOrigins: [
+        "https://*.cloudworkstations.dev",
+    ]
   },
 };
 

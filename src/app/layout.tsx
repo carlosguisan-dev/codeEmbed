@@ -34,19 +34,22 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const isAppPage = !isAuthPage && !isPublicPage && !isEmbedPage;
 
   useEffect(() => {
+    // If we are on an app page and the user is not logged in after loading, redirect to login.
     if (isAppPage && !isUserLoading && !user) {
       router.push('/login');
     }
+    // If we are on the login page and the user is already logged in, redirect to dashboard.
     if (isAuthPage && !isUserLoading && user) {
         router.push('/dashboard');
     }
-  }, [user, isUserLoading, router, isAppPage, isAuthPage]);
+  }, [user, isUserLoading, router, pathname, isAppPage, isAuthPage]);
+
 
   if (isPublicPage || isAuthPage || isEmbedPage) {
     return <>{children}</>;
   }
 
-  // Render loading state for protected app pages
+  // Render loading state for protected app pages while checking auth.
   if (isUserLoading || !user) {
     return (
       <div className="flex h-screen w-full">

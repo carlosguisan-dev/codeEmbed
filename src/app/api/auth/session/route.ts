@@ -3,9 +3,8 @@ import type { auth } from 'firebase-admin';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-function getAuth(): auth.Auth {
-    return getFirebaseAdmin().auth;
-}
+// This function must be outside the handler to ensure Admin SDK is initialized once.
+const adminAuth: auth.Auth = getFirebaseAdmin().auth;
 
 export async function POST(req: NextRequest) {
   const { idToken } = await req.json();
@@ -18,7 +17,7 @@ export async function POST(req: NextRequest) {
   const expiresIn = 60 * 60 * 24 * 5 * 1000;
 
   try {
-    const sessionCookie = await getAuth().createSessionCookie(idToken, { expiresIn });
+    const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
 
     // Set cookie policy for session cookie.
     cookies().set('session', sessionCookie, {
@@ -32,7 +31,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('Session cookie creation failed:', error);
-    return NextResponse.json({ error: 'Failed to create session.' }, { status: 401 });
+    // Provide a more specific error message for debugging
+    const errorMessage = error.message || 'Failed to create session.';
+    return NextResponse.json({ error: errorMessage }, { status: 401 });
   }
 }
 

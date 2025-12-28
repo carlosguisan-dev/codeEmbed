@@ -5,10 +5,9 @@ import type { Snippet } from '@/lib/definitions';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SnippetCard } from '@/components/snippet-card';
-import { PlusCircle, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { Button } from './ui/button';
-import Link from 'next/link';
 
 type SortOption = 'newest' | 'oldest' | 'title-asc' | 'title-desc';
 
@@ -54,12 +53,6 @@ export function DashboardClient({ snippets }: { snippets: Snippet[] }) {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <h1 className="text-3xl font-bold font-headline">{t('my_snippets_title')}</h1>
-          <Button asChild>
-            <Link href="/snippets/new">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                {t('create_snippet_button')}
-            </Link>
-          </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -105,12 +98,6 @@ export function DashboardClient({ snippets }: { snippets: Snippet[] }) {
         <div className="text-center py-16 border-2 border-dashed rounded-lg">
           <h3 className="text-xl font-semibold">{t('no_snippets_found_title')}</h3>
           <p className="text-muted-foreground mt-2">{t('no_snippets_found_desc')}</p>
-          <Button asChild className="mt-4">
-            <Link href="/snippets/new">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                {t('create_first_snippet_button')}
-            </Link>
-          </Button>
         </div>
       )}
     </div>

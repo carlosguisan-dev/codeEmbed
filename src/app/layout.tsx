@@ -1,5 +1,4 @@
 'use client';
-import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { TranslationProvider } from '@/hooks/use-translation';
@@ -16,7 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AppHeader } from '@/components/app-header';
 import Link from 'next/link';
-import { CodeXml, LayoutDashboard, Loader2 } from 'lucide-react';
+import { LayoutDashboard, Loader2 } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { FirebaseClientProvider, useFirebase } from '@/firebase';
 import { usePathname, useRouter } from 'next/navigation';
@@ -89,14 +88,6 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                 <Link href="/dashboard">
                   <LayoutDashboard />
                   <span>Dashboard</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="New Snippet">
-                <Link href="/snippets/new">
-                  <CodeXml />
-                  <span>New Snippet</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

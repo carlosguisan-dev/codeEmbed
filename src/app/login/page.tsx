@@ -26,8 +26,10 @@ function LoginPageContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: FormEvent) => {
+    e.preventDefault();
     if (!auth) {
       toast({
         variant: 'destructive',
@@ -38,6 +40,7 @@ function LoginPageContent() {
     }
 
     setIsLoading(true);
+    setError(null);
 
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -46,7 +49,7 @@ function LoginPageContent() {
         password
       );
 
-      // Force token refresh to get the latest token.
+      // It's recommended to force token refresh to get the latest token.
       const idToken = await userCredential.user.getIdToken(true);
 
       // Send token to server to create session cookie
@@ -61,15 +64,21 @@ function LoginPageContent() {
         throw new Error(errorData.error || 'Failed to create session.');
       }
       
-      // The onAuthStateChanged listener in the layout will handle the redirect
-      // This avoids race conditions.
+      // onAuthStateChanged in FirebaseProvider will handle the user state update.
+      // Redirect will be handled by the layout.
+      router.push('/dashboard');
 
     } catch (error: any) {
+      console.error(error);
+      const errorMessage =
+        error.code === 'auth/invalid-credential'
+          ? 'Invalid email or password.'
+          : error.message || 'An unexpected error occurred. Please try again.';
+      setError(errorMessage);
       toast({
         variant: 'destructive',
         title: 'Authentication Failed',
-        description:
-          error.message || 'An unexpected error occurred. Please try again.',
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
@@ -77,24 +86,19 @@ function LoginPageContent() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <div className="w-[400px]">
-        <div className="flex justify-center mb-4">
+    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+      <div className="w-full max-w-md">
+        <div className="flex justify-center mb-6">
           <Logo width={200} height={50} />
         </div>
         <Card>
-          <CardHeader>
-            <CardTitle>Login</CardTitle>
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
             <CardDescription>
-              Access your account to manage your code snippets.
+              Sign in to continue to your CodeEmbed dashboard.
             </CardDescription>
           </CardHeader>
-          <form
-            onSubmit={(e: FormEvent) => {
-              e.preventDefault();
-              handleLogin();
-            }}
-          >
+          <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="login-email">Email</Label>
@@ -120,10 +124,10 @@ function LoginPageContent() {
                 />
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex flex-col gap-4">
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Login
+                Sign In
               </Button>
             </CardFooter>
           </form>

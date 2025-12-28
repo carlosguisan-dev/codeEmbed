@@ -16,23 +16,64 @@ import {
 } from '@/components/ui/sidebar';
 import { AppHeader } from '@/components/app-header';
 import Link from 'next/link';
-import { CodeXml, LayoutDashboard } from 'lucide-react';
+import { CodeXml, LayoutDashboard, Loader2 } from 'lucide-react';
 import { Logo } from '@/components/icons';
-import { FirebaseClientProvider } from '@/firebase';
-import { usePathname } from 'next/navigation';
+import { FirebaseClientProvider, useFirebase } from '@/firebase';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, isUserLoading } = useFirebase();
 
   const isPublicPage = pathname === '/';
+  const isLoginPage = pathname === '/login';
   const isEmbedPage = pathname.startsWith('/embed');
-  const isAppPage = !isPublicPage && !isEmbedPage;
+  const isAppPage = !isPublicPage && !isLoginPage && !isEmbedPage;
+
+  useEffect(() => {
+    if (isUserLoading) return; // Wait until loading is finished
+
+    // If user is not logged in and tries to access an app page, redirect to login
+    if (!user && isAppPage) {
+      router.push('/login');
+    }
+
+    // If user is logged in and tries to access login page, redirect to dashboard
+    if (user && isLoginPage) {
+      router.push('/dashboard');
+    }
+  }, [user, isUserLoading, isAppPage, isLoginPage, router]);
+
 
   if (isPublicPage || isEmbedPage) {
     return <>{children}</>;
   }
 
-  // Render the full app layout for all users now
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+  
+  if (isUserLoading && isAppPage) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user && isAppPage) {
+    // This will be briefly visible before the useEffect redirect kicks in
+    // Or if the redirect fails for some reason.
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Redirecting to login...</p>
+      </div>
+    );
+  }
+
+  // Render the full app layout for authenticated users
   return (
     <SidebarProvider>
       <Sidebar>

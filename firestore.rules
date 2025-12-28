@@ -1,12 +1,27 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ATENCIÓN: Estas reglas permiten el acceso público total.
-    // Son solo para desarrollo y deben ser reemplazadas por reglas seguras antes de producción.
-    match /{document=**} {
-      allow read, write: if true;
+  
+    // Helper function to check if a user is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // Users can only read/write their own profile
+    match /users/{userId} {
+      allow read, update, delete: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn();
+    }
+    
+    // Snippets can be read by anyone if they are public.
+    // They can only be created, updated, or deleted by the owner.
+    // Users can list their own snippets.
+    match /snippets/{snippetId} {
+      allow get: if resource.data.isPublic == true || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow list: if isSignedIn() && request.query.get("userId") == request.auth.uid;
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
   }
 }

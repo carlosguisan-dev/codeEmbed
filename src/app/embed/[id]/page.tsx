@@ -16,11 +16,11 @@ import type { Snippet } from '@/lib/definitions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect } from 'react';
 
-function EmbedPageContent({ params }: { params: { id: string } }) {
+function EmbedPageContent({ id }: { id: string }) {
   const { firestore } = useFirebase();
   const snippetRef = useMemoFirebase(
-    () => (firestore ? doc(firestore, 'snippets', params.id) : null),
-    [firestore, params.id]
+    () => (firestore ? doc(firestore, 'snippets', id) : null),
+    [firestore, id]
   );
   const { data: snippet, isLoading } = useDoc<Snippet>(snippetRef);
 
@@ -85,7 +85,7 @@ function EmbedPageContent({ params }: { params: { id: string } }) {
 export default function EmbedPage({ params }: { params: { id: string } }) {
     return (
         <FirebaseClientProvider>
-            <EmbedPageContent params={params} />
+            <EmbedPageContent id={params.id} />
         </FirebaseClientProvider>
     )
 }

@@ -57,12 +57,7 @@
         "title",
         "code",
         "language",
-        "isPublic",
-        "createdAt",
-        "updatedAt",
-        "viewCount",
-        "theme",
-        "lineNumbers"
+        "isPublic"
       ]
     },
     "User": {
@@ -89,8 +84,7 @@
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "password"
     ]
   },
   "firestore": {

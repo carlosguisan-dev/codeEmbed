@@ -11,7 +11,7 @@ import {
 import { FileText } from 'lucide-react';
 import { updateSnippetViewCount } from '@/lib/actions';
 import { FirebaseClientProvider, useDoc, useFirebase, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import type { Snippet } from '@/lib/definitions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect } from 'react';
@@ -25,12 +25,13 @@ function EmbedPageContent({ id }: { id: string }) {
   const { data: snippet, isLoading } = useDoc<Snippet>(snippetRef);
 
   useEffect(() => {
-    if (snippet) {
-      // This is where you would increment the view count in a real DB
-      // For this mock, we'll call a server action that logs to the console
-      updateSnippetViewCount(snippet.id);
+    if (snippet && firestore) {
+      const docRef = doc(firestore, 'snippets', snippet.id);
+      updateDoc(docRef, {
+        viewCount: (snippet.viewCount || 0) + 1,
+      }).catch(err => console.error("Failed to update view count:", err));
     }
-  }, [snippet]);
+  }, [snippet, firestore]);
 
 
   if (isLoading) {
@@ -83,9 +84,10 @@ function EmbedPageContent({ id }: { id: string }) {
 
 
 export default function EmbedPage({ params }: { params: { id: string } }) {
+    const id = params.id;
     return (
         <FirebaseClientProvider>
-            <EmbedPageContent id={params.id} />
+            <EmbedPageContent id={id} />
         </FirebaseClientProvider>
     )
 }

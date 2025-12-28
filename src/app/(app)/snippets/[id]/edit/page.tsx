@@ -12,7 +12,7 @@ export default function EditSnippetPage({
 }: {
   params: { id: string };
 }) {
-  const { id } = params;
+  const id = params.id;
   const { firestore } = useFirebase();
 
   const snippetRef = useMemoFirebase(
@@ -25,7 +25,10 @@ export default function EditSnippetPage({
   if (isLoading) {
     return (
         <div className="space-y-8">
-            <Skeleton className="h-24 w-full" />
+            <div className="flex justify-between items-center">
+                <Skeleton className="h-10 w-1/2" />
+                <Skeleton className="h-10 w-32" />
+            </div>
             <Skeleton className="h-96 w-full" />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <Skeleton className="h-64 w-full" />

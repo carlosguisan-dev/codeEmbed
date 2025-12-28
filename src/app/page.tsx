@@ -63,7 +63,7 @@ export default function LandingPage() {
                           <span className="text-xs text-foreground/80">javascript</span>
                           <span className="text-xs text-foreground/50">code-embed.app</span>
                       </div>
-                      <pre className="text-sm text-foreground/90">
+                      <pre className="text-sm text-foreground/90 overflow-x-auto">
 <code><span className="text-purple-400">function</span> <span className="text-blue-400">helloWorld</span>() {'{'}
   <span className="text-purple-400">console</span>.<span className="text-yellow-400">log</span>(<span className="text-green-400">"Hello, World!"</span>);
 {'}'}

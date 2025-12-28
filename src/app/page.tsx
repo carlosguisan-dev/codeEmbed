@@ -39,8 +39,7 @@ export default function LandingPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <header className="px-4 lg:px-6 h-16 flex items-center">
         <Link href="/" className="flex items-center justify-center gap-2">
-          <Logo className="h-6 w-6 text-primary" />
-          <span className="text-xl font-semibold font-headline">CodeEmbed</span>
+          <Logo width={150} height={40} />
         </Link>
       </header>
       <main className="flex-1">

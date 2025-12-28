@@ -89,7 +89,7 @@ function LoginPageContent() {
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Tabs defaultValue="login" className="w-[400px]">
         <div className="flex justify-center mb-4">
-            <Logo className="w-12 h-12 text-primary" />
+            <Logo width={200} height={50} />
         </div>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="login">Login</TabsTrigger>

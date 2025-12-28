@@ -20,10 +20,10 @@ El "vibecoding" es un enfoque de desarrollo que prioriza la velocidad, la iterac
 
 Este proyecto integra un conjunto de tecnologías modernas, elegidas por su eficiencia y escalabilidad:
 
-- **Framework**: Next.js (App Router)
-- **Inteligencia Artificial**: Google Gemini
-- **Backend y Base de Datos**: Firebase (Authentication & Firestore)
+- **Framework**: Next.js (App Router).
+- **Inteligencia Artificial**: Google Gemini.
+- **Backend y Base de Datos**: Firebase (Authentication & Firestore).
 - **UI/UX**: ShadCN UI y Tailwind CSS para un diseño elegante y responsivo.
-- **Entorno de Desarrollo**: Firebase Studio
+- **Entorno de Desarrollo**: Firebase Studio.
 
 Este proyecto no solo es una herramienta funcional, sino también una demostración de lo que es posible lograr cuando la visión de un desarrollador se combina con el poder de la inteligencia artificial generativa.

@@ -3,12 +3,8 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Logo } from '@/components/icons';
 import { Code, Share2, ArrowRight } from 'lucide-react';
-import { useFirebase } from '@/firebase';
-import { useRouter } from 'next/navigation';
 
 export default function LandingPage() {
-  const { user, isUserLoading } = useFirebase();
-  const router = useRouter();
 
   const codeExample = `
 <span class="text-purple-400">function</span> <span class="text-blue-400">helloWorld</span>() {
@@ -17,23 +13,6 @@ export default function LandingPage() {
 
 <span class="text-blue-400">helloWorld</span>();
   `.trim();
-
-  if (isUserLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (user) {
-    router.push('/dashboard');
-    return (
-        <div className="flex h-screen w-full items-center justify-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
-        </div>
-    );
-  }
   
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -41,6 +20,13 @@ export default function LandingPage() {
         <Link href="/" className="flex items-center justify-center gap-2">
           <Logo width={150} height={40} />
         </Link>
+        <nav className="ml-auto flex gap-4 sm:gap-6">
+            <Button asChild variant="ghost">
+                <Link href="/dashboard">
+                    Go to App
+                </Link>
+            </Button>
+        </nav>
       </header>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
@@ -57,7 +43,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg">
-                    <Link href="/login">
+                    <Link href="/dashboard">
                       Empezar ahora
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>

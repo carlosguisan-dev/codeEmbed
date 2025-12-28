@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { TranslationProvider } from '@/hooks/use-translation';
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   SidebarProvider,
   Sidebar,
@@ -18,75 +18,21 @@ import { AppHeader } from '@/components/app-header';
 import Link from 'next/link';
 import { CodeXml, LayoutDashboard } from 'lucide-react';
 import { Logo } from '@/components/icons';
-import { FirebaseClientProvider, useFirebase } from '@/firebase';
-import { useRouter, usePathname } from 'next/navigation';
-import { Skeleton } from '@/components/ui/skeleton';
+import { FirebaseClientProvider } from '@/firebase';
+import { usePathname } from 'next/navigation';
 
 function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, isUserLoading } = useFirebase();
-  const router = useRouter();
   const pathname = usePathname();
 
-  const isAuthPage = pathname === '/login';
   const isPublicPage = pathname === '/';
   const isEmbedPage = pathname.startsWith('/embed');
+  const isAppPage = !isPublicPage && !isEmbedPage;
 
-  const isAppPage = !isAuthPage && !isPublicPage && !isEmbedPage;
-
-  useEffect(() => {
-    // If we are on an app page and the user is not logged in after loading, redirect to login.
-    if (isAppPage && !isUserLoading && !user) {
-      router.push('/login');
-    }
-    // If we are on the login page and the user is already logged in, redirect to dashboard.
-    if (isAuthPage && !isUserLoading && user) {
-        router.push('/dashboard');
-    }
-  }, [user, isUserLoading, router, pathname, isAppPage, isAuthPage]);
-
-
-  if (isPublicPage || isAuthPage || isEmbedPage) {
+  if (isPublicPage || isEmbedPage) {
     return <>{children}</>;
   }
 
-  // Render loading state for protected app pages while checking auth.
-  if (isUserLoading || !user) {
-    return (
-      <div className="flex h-screen w-full">
-        <div className="hidden md:flex flex-col gap-4 p-2 border-r bg-card">
-          <div className="flex items-center gap-2 p-2">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-6 w-32" />
-          </div>
-          <div className="p-2 space-y-2">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </div>
-        <div className="flex-1 flex flex-col">
-          <header className="flex h-16 items-center gap-4 border-b px-4 md:px-6">
-            <Skeleton className="h-8 w-8 md:hidden" />
-            <div className="flex-1">
-              <Skeleton className="h-6 w-48" />
-            </div>
-            <Skeleton className="h-10 w-10 rounded-full" />
-          </header>
-          <main className="p-4 sm:p-6 lg:p-8">
-            <div className="space-y-6">
-              <Skeleton className="h-9 w-48" />
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                <Skeleton className="h-40 w-full" />
-                <Skeleton className="h-40 w-full" />
-                <Skeleton className="h-40 w-full" />
-              </div>
-            </div>
-          </main>
-        </div>
-      </div>
-    );
-  }
-
-  // Render the full app layout for authenticated users
+  // Render the full app layout for all users now
   return (
     <SidebarProvider>
       <Sidebar>

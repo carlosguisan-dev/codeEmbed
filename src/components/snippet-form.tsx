@@ -1,8 +1,5 @@
 'use client';
 
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import type { Snippet } from '@/lib/definitions';
 import { LANGUAGES, THEMES } from '@/lib/data';
 import { createSnippetAction, updateSnippetAction } from '@/lib/actions';
@@ -24,18 +21,6 @@ import { Save, Loader2, Share2 } from 'lucide-react';
 import { EmbedDialog } from './embed-dialog';
 
 
-const snippetSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(100),
-  description: z.string().max(500).optional(),
-  code: z.string().min(1, 'Code cannot be empty'),
-  language: z.string(),
-  theme: z.enum(['light', 'dark']),
-  lineNumbers: z.boolean(),
-  isPublic: z.boolean(),
-});
-
-type SnippetFormData = z.infer<typeof snippetSchema>;
-
 interface SnippetFormProps {
   snippet?: Snippet;
 }
@@ -49,9 +34,7 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
   const [savedSnippet, setSavedSnippet] = useState<Snippet | null>(snippet || null);
   const [isEmbedDialogOpen, setEmbedDialogOpen] = useState(false);
 
-  const { register, handleSubmit, control, watch, formState: { errors } } = useForm<SnippetFormData>({
-    resolver: zodResolver(snippetSchema),
-    defaultValues: {
+  const [formData, setFormData] = useState({
       title: snippet?.title || '',
       description: snippet?.description || '',
       code: snippet?.code || '',
@@ -59,12 +42,12 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
       theme: snippet?.theme || 'dark',
       lineNumbers: snippet?.lineNumbers ?? true,
       isPublic: snippet?.isPublic ?? false,
-    },
   });
 
-  const [previewHeight, setPreviewHeight] = useState(300);
-  const formData = watch();
+  const [errors, setErrors] = useState<{title?: string, code?: string}>({});
 
+  const [previewHeight, setPreviewHeight] = useState(300);
+  
   const [charCount, setCharCount] = useState(formData.code.length);
   const [lineCount, setLineCount] = useState(formData.code.split('\n').length);
   
@@ -74,14 +57,41 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
   }, [formData.code]);
 
 
-  const onSubmit = (data: SnippetFormData) => {
+  const validate = () => {
+    const newErrors: {title?: string, code?: string} = {};
+    if (!formData.title) newErrors.title = 'Title is required';
+    if (!formData.code) newErrors.code = 'Code cannot be empty';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({...prev, [id]: value}));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSwitchChange = (name: string, checked: boolean) => {
+      setFormData(prev => ({ ...prev, [name]: checked }));
+  };
+
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) {
+      return;
+    }
+
     startTransition(async () => {
       const action = isEditMode ? updateSnippetAction : createSnippetAction;
-      const payload = isEditMode ? { id: snippet.id, ...data } : data;
+      const payload = isEditMode ? { id: snippet.id, ...formData } : formData;
       const result = await action(payload as any);
 
       if (result.success && result.data) {
-        toast({ title: isEditMode ? t('toast_snippet_updated_title') : t('toast_snippet_created_title'), description: data.title });
+        toast({ title: isEditMode ? t('toast_snippet_updated_title') : t('toast_snippet_created_title'), description: formData.title });
         setSavedSnippet(result.data);
         if (!isEditMode) {
             router.push(`/snippets/${result.data.id}/edit`);
@@ -95,14 +105,14 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
 
   return (
     <>
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={onSubmit} className="space-y-8">
         <Card>
             <CardHeader>
                 <CardTitle className="font-headline">{t('title_label')}</CardTitle>
             </CardHeader>
             <CardContent>
-                <Input id="title" {...register('title')} placeholder={t('title_placeholder')} />
-                {errors.title && <p className="text-sm text-destructive mt-1">{errors.title.message}</p>}
+                <Input id="title" value={formData.title} onChange={handleChange} placeholder={t('title_placeholder')} />
+                {errors.title && <p className="text-sm text-destructive mt-1">{errors.title}</p>}
             </CardContent>
         </Card>
 
@@ -111,8 +121,8 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
                 <CardTitle className="font-headline">{t('code_label')}</CardTitle>
             </CardHeader>
             <CardContent>
-                <Textarea id="code" {...register('code')} className="font-code min-h-[400px]" placeholder="// Your code here" />
-                {errors.code && <p className="text-sm text-destructive mt-1">{errors.code.message}</p>}
+                <Textarea id="code" value={formData.code} onChange={handleChange} className="font-code min-h-[400px]" placeholder="// Your code here" />
+                {errors.code && <p className="text-sm text-destructive mt-1">{errors.code}</p>}
                 <div className="text-xs text-muted-foreground mt-2 flex justify-end gap-4">
                     <span>{t('line_counter', { count: lineCount })}</span>
                     <span>{t('char_counter', { count: charCount })}</span>
@@ -129,25 +139,21 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <Label>{t('language_label')}</Label>
-                            <Controller name="language" control={control} render={({ field }) => (
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        {LANGUAGES.map(lang => <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                            )} />
+                            <Select onValueChange={(value) => handleSelectChange('language', value)} defaultValue={formData.language}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {LANGUAGES.map(lang => <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
                         </div>
                          <div>
                             <Label>{t('theme_label')}</Label>
-                            <Controller name="theme" control={control} render={({ field }) => (
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        {THEMES.map(theme => <SelectItem key={theme.value} value={theme.value}>{theme.label}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
-                            )} />
+                            <Select onValueChange={(value) => handleSelectChange('theme', value)} defaultValue={formData.theme}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {THEMES.map(theme => <SelectItem key={theme.value} value={theme.value}>{theme.label}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
                     <div className="flex items-center justify-between">
@@ -155,18 +161,14 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
                             <span>{t('line_numbers_label')}</span>
                             <span className="font-normal text-sm text-muted-foreground">{t('line_numbers_desc')}</span>
                         </Label>
-                        <Controller name="lineNumbers" control={control} render={({ field }) => (
-                            <Switch id="lineNumbers" checked={field.value} onCheckedChange={field.onChange} />
-                        )} />
+                        <Switch id="lineNumbers" checked={formData.lineNumbers} onCheckedChange={(checked) => handleSwitchChange('lineNumbers', checked)} />
                     </div>
                     <div className="flex items-center justify-between">
                         <Label htmlFor="isPublic" className="flex flex-col">
                             <span>{t('public_access_label')}</span>
                             <span className="font-normal text-sm text-muted-foreground">{t('public_access_desc')}</span>
                         </Label>
-                        <Controller name="isPublic" control={control} render={({ field }) => (
-                             <Switch id="isPublic" checked={field.value} onCheckedChange={field.onChange} />
-                        )} />
+                        <Switch id="isPublic" checked={formData.isPublic} onCheckedChange={(checked) => handleSwitchChange('isPublic', checked)} />
                     </div>
                 </CardContent>
             </Card>
@@ -175,8 +177,7 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
                     <CardTitle className="font-headline">{t('description_label')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Textarea id="description" {...register('description')} placeholder={t('description_placeholder')} className="min-h-[244px]" />
-                    {errors.description && <p className="text-sm text-destructive mt-1">{errors.description.message}</p>}
+                    <Textarea id="description" value={formData.description} onChange={handleChange} placeholder={t('description_placeholder')} className="min-h-[244px]" />
                 </CardContent>
             </Card>
         </div>
@@ -196,7 +197,7 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
                         <CodePreview
                             code={formData.code}
                             language={formData.language}
-                            theme={formData.theme}
+                            theme={formData.theme as 'light' | 'dark'}
                             showLineNumbers={formData.lineNumbers}
                         />
                     </div>

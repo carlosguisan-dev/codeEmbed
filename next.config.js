@@ -45,11 +45,6 @@ const nextConfig = {
     buildActivity: true,
     buildActivityPosition: 'bottom-right',
   },
-  experimental: {
-    // This is to silence the CORS warning in development.
-    // In a future version of Next.js, this will be the default behavior.
-    allowedDevOrigins: [],
-  },
 };
 
 module.exports = nextConfig;

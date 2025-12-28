@@ -1,9 +1,11 @@
 'use client';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { CodePreview } from '@/components/code-preview';
 import {
   Card,
   CardContent,
+  CardFooter,
   CardHeader,
   CardTitle,
   CardDescription,
@@ -14,6 +16,8 @@ import { doc, updateDoc, increment } from 'firebase/firestore';
 import type { Snippet } from '@/lib/definitions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect } from 'react';
+import { Logo } from '@/components/icons';
+
 
 function EmbedPageContent({ id }: { id: string }) {
   const { firestore } = useFirebase();
@@ -72,7 +76,7 @@ function EmbedPageContent({ id }: { id: string }) {
 
   return (
     <div className="p-4 sm:p-6 md:p-8">
-      <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl">
+      <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl overflow-hidden">
         <CardHeader>
           <div className="flex items-start gap-4">
             <FileText className="w-8 h-8 text-primary mt-1" />
@@ -93,6 +97,12 @@ function EmbedPageContent({ id }: { id: string }) {
             isEmbed={true}
           />
         </CardContent>
+        <CardFooter className="bg-muted/50 px-4 py-2">
+            <Link href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
+                <span>Powered by</span>
+                <Logo width={100} height={25} />
+            </Link>
+        </CardFooter>
       </Card>
     </div>
   );

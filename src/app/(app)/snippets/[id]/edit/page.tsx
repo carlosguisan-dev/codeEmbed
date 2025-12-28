@@ -8,10 +8,11 @@ import { notFound } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function EditSnippetPage({
-  params: { id },
+  params,
 }: {
   params: { id: string };
 }) {
+  const { id } = params;
   const { firestore } = useFirebase();
 
   const snippetRef = useMemoFirebase(

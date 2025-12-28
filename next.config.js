@@ -9,13 +9,6 @@ const nextConfig = {
   images: {
     remotePatterns: [],
   },
-  devIndicators: {
-    buildActivity: true,
-    buildActivityPosition: 'bottom-right',
-    allowedDevOrigins: [
-        "https://*.cloudworkstations.dev",
-    ]
-  },
 };
 
 module.exports = nextConfig;

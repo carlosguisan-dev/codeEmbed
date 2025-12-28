@@ -27,7 +27,7 @@
     "toast_snippet_created_title": "Snippet Creado",
     "toast_snippet_updated_title": "Snippet Actualizado",
     "toast_snippet_deleted_title": "Snippet Eliminado",
-    "toast_snippet_deleted_desc": "El snippet ha sido eliminado.",
+    "toast_snippet_deleted_desc": "El snippet '{{title}}' ha sido eliminado.",
     "toast_snippet_duplicated_title": "Snippet Duplicado",
     "toast_snippet_duplicated_desc": "Se ha creado una copia del snippet.",
     "toast_error_title": "Ocurrió un Error",
@@ -64,5 +64,10 @@
     "profile": "Perfil",
     "billing": "Facturación",
     "settings": "Ajustes",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "delete_button": "Eliminar",
+    "delete_dialog_title": "¿Estás completamente seguro?",
+    "delete_dialog_desc": "Esta acción no se puede deshacer. Esto eliminará permanentemente tu snippet y borrará sus datos de nuestros servidores.",
+    "cancel": "Cancelar",
+    "confirm_delete_button": "Sí, eliminar snippet"
 }

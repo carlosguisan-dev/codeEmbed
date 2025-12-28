@@ -27,7 +27,7 @@
     "toast_snippet_created_title": "Snippet Created",
     "toast_snippet_updated_title": "Snippet Updated",
     "toast_snippet_deleted_title": "Snippet Deleted",
-    "toast_snippet_deleted_desc": "The snippet has been removed.",
+    "toast_snippet_deleted_desc": "The snippet '{{title}}' has been removed.",
     "toast_snippet_duplicated_title": "Snippet Duplicated",
     "toast_snippet_duplicated_desc": "A copy of the snippet has been created.",
     "toast_error_title": "An Error Occurred",
@@ -64,5 +64,10 @@
     "profile": "Profile",
     "billing": "Billing",
     "settings": "Settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "delete_button": "Delete",
+    "delete_dialog_title": "Are you absolutely sure?",
+    "delete_dialog_desc": "This action cannot be undone. This will permanently delete your snippet and remove its data from our servers.",
+    "cancel": "Cancel",
+    "confirm_delete_button": "Yes, delete snippet"
 }

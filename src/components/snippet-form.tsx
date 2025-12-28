@@ -17,11 +17,22 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { CodePreview } from './code-preview';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
-import { Save, Loader2, Share2 } from 'lucide-react';
+import { Save, Loader2, Share2, Trash2 } from 'lucide-react';
 import { EmbedDialog } from './embed-dialog';
 import { useFirebase } from '@/firebase';
-import { setDocumentNonBlocking, addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { setDocumentNonBlocking, addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { collection, doc, serverTimestamp } from 'firebase/firestore';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 
 interface SnippetFormProps {
@@ -126,6 +137,20 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
     });
   };
 
+  const handleDelete = () => {
+    if (!user || !firestore || !snippet) return;
+
+    startTransition(() => {
+        const snippetRef = doc(firestore, 'snippets', snippet.id);
+        deleteDocumentNonBlocking(snippetRef);
+        toast({ 
+            title: t('toast_snippet_deleted_title'), 
+            description: t('toast_snippet_deleted_desc', { title: snippet.title })
+        });
+        router.push('/dashboard');
+    });
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({...prev, [id]: value}));
@@ -142,14 +167,38 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
   return (
     <>
     <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="flex justify-between items-start">
+        <div className="flex flex-wrap gap-4 justify-between items-start">
             <h1 className="text-3xl font-bold font-headline">{isEditMode ? t('edit_snippet_title') : t('new_snippet_title')}</h1>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
                 {isEditMode && (
-                  <Button type="button" variant="outline" onClick={() => setEmbedDialogOpen(true)} disabled={!savedSnippet}>
-                    <Share2 className="mr-2 h-4 w-4" />
-                    {t('share_embed_button')}
-                  </Button>
+                  <>
+                    <Button type="button" variant="outline" onClick={() => setEmbedDialogOpen(true)} disabled={!savedSnippet}>
+                      <Share2 className="mr-2 h-4 w-4" />
+                      {t('share_embed_button')}
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button type="button" variant="destructive" disabled={isPending}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            {t('delete_button')}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>{t('delete_dialog_title')}</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {t('delete_dialog_desc')}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                            {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t('confirm_delete_button')}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </>
                 )}
                 <Button type="submit" disabled={isPending || !user}>
                   {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}

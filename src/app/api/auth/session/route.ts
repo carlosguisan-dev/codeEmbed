@@ -1,10 +1,11 @@
 import { getFirebaseAdmin } from '@/lib/firebase-admin';
-import { auth } from 'firebase-admin';
+import type { auth } from 'firebase-admin';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-// Initialize Firebase Admin
-getFirebaseAdmin();
+function getAuth(): auth.Auth {
+    return getFirebaseAdmin().auth;
+}
 
 export async function POST(req: NextRequest) {
   const { idToken } = await req.json();
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
   const expiresIn = 60 * 60 * 24 * 5 * 1000;
 
   try {
-    const sessionCookie = await auth().createSessionCookie(idToken, { expiresIn });
+    const sessionCookie = await getAuth().createSessionCookie(idToken, { expiresIn });
 
     // Set cookie policy for session cookie.
     cookies().set('session', sessionCookie, {

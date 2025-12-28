@@ -24,19 +24,28 @@ function EmbedPageContent({ id }: { id: string }) {
   const { data: snippet, isLoading } = useDoc<Snippet>(snippetRef);
 
   useEffect(() => {
-    // Only increment the view count if we have the snippet data and a firestore instance.
-    // This prevents trying to update a document that hasn't been loaded yet.
+    // This effect handles incrementing the view count once per session.
     if (snippet && firestore) {
-      const docRef = doc(firestore, 'snippets', id);
-      // We use a simple updateDoc here. The non-blocking wrapper isn't strictly necessary
-      // for this use case, as we don't need optimistic UI updates for a view counter.
-      updateDoc(docRef, {
-        viewCount: increment(1),
-      }).catch(err => {
-        // Silently fail on view count increment error.
-        // It's not critical for the user experience on the embed page.
-        console.error("Failed to increment view count:", err);
-      });
+      const sessionStorageKey = `viewed-snippet-${id}`;
+      const hasViewed = sessionStorage.getItem(sessionStorageKey);
+
+      // Only increment if the user hasn't viewed this snippet in this session.
+      if (!hasViewed) {
+        const docRef = doc(firestore, 'snippets', id);
+        
+        updateDoc(docRef, {
+          viewCount: increment(1),
+        })
+        .then(() => {
+          // Once the view is successfully recorded, mark it in session storage.
+          sessionStorage.setItem(sessionStorageKey, 'true');
+        })
+        .catch(err => {
+          // Silently fail on view count increment error.
+          // It's not critical for the user experience on the embed page.
+          console.error("Failed to increment view count:", err);
+        });
+      }
     }
   }, [snippet, firestore, id]);
 

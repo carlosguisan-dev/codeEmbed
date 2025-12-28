@@ -3,48 +3,10 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Helper functions
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-    
-    function isNewSnippetOwner(userId) {
-        return request.resource.data.userId == userId;
-    }
-
-    // Snippets collection
-    match /snippets/{snippetId} {
-      // Anyone can read a public snippet
-      allow get: if resource.data.isPublic == true;
-      
-      // Users can read their own private snippets
-      allow get: if isOwner(resource.data.userId) && resource.data.isPublic == false;
-
-      // Users can query their own snippets by userId.
-      // This rule is crucial for the dashboard page to work.
-      // It allows a 'list' operation (like a query) only if it includes a 'where' clause
-      // that filters for the currently authenticated user's ID.
-      allow list: if isSignedIn() && request.query.get('userId') == request.auth.uid;
-      
-      // Allow creating a snippet if the user is the owner
-      allow create: if isSignedIn() && isNewSnippetOwner(request.auth.uid);
-
-      // Allow updating a snippet if the user is the owner
-      allow update: if isOwner(resource.data.userId);
-
-      // Allow deleting a snippet if the user is the owner
-      allow delete: if isOwner(resource.data.userId);
-    }
-
-    // Users collection
-    match /users/{userId} {
-      // Only the owner can read or write their user document
-      allow read, write: if isOwner(userId);
+    // ATENCIÓN: Estas reglas permiten el acceso público total.
+    // Son solo para desarrollo y deben ser reemplazadas por reglas seguras antes de producción.
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }

@@ -17,14 +17,30 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/hooks/use-translation';
 import { LanguageSwitcher } from './language-switcher';
-import { getUser } from '@/lib/data';
-
-// This is a client component, but we can still fetch initial data on the server
-// and pass it down. In a real app, this would come from an auth context.
-const user = getUser();
+import { useFirebase } from '@/firebase';
+import { Skeleton } from './ui/skeleton';
 
 export function UserNav() {
   const { t } = useTranslation();
+  const { user, isUserLoading } = useFirebase();
+
+  if (isUserLoading) {
+    return (
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-8 w-8" />
+        <Skeleton className="h-10 w-10 rounded-full" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+        <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <Button variant="outline">Sign In</Button>
+        </div>
+    )
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -33,15 +49,15 @@ export function UserNav() {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={user.avatarUrl} alt={user.name} />
-              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+              {user.photoURL && <AvatarImage src={user.photoURL} alt={user.displayName || 'User'} />}
+              <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0)}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{user.name}</p>
+              <p className="text-sm font-medium leading-none">{user.displayName}</p>
               <p className="text-xs leading-none text-muted-foreground">
                 {user.email}
               </p>

@@ -2,7 +2,7 @@ export type Snippet = {
   id: string;
   userId: string;
   title: string;
-  description: string;
+  description?: string;
   code: string;
   language: string;
   theme: 'light' | 'dark';

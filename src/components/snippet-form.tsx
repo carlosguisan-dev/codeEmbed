@@ -117,7 +117,7 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
               </div>
               <div>
                 <Label htmlFor="code">{t('code_label')}</Label>
-                <Textarea id="code" {...register('code')} className="font-code min-h-[250px]" placeholder="// Your code here" />
+                <Textarea id="code" {...register('code')} className="font-code min-h-[400px]" placeholder="// Your code here" />
                 {errors.code && <p className="text-sm text-destructive mt-1">{errors.code.message}</p>}
                 <div className="text-xs text-muted-foreground mt-2 flex justify-end gap-4">
                     <span>{t('line_counter', { count: lineCount })}</span>

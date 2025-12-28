@@ -1,48 +1,29 @@
-# CodeEmbed - A Vibecoding Project
+# CodeEmbed - Un Proyecto de Vibecoding con IA
 
-This project was built live using **Firebase Studio**, with **Gemini** as the AI coding partner. It's a "vibecoding" session result, demonstrating rapid application development with generative AI.
+`CodeEmbed` es una aplicación web moderna para gestionar, compartir e incrustar fragmentos de código, creada como parte de una sesión de "vibecoding". Este proyecto demuestra el poder del desarrollo rápido de aplicaciones (RAD) utilizando herramientas de última generación y la colaboración con una IA de codificación.
 
-The application is a code snippet manager that allows users to create, share, and embed syntax-highlighted code blocks.
+El resultado es una plataforma funcional y estéticamente agradable, construida en tiempo real con **Gemini** como socio de codificación dentro de **Firebase Studio**.
 
-## Tech Stack
+## ¿Qué es "Vibecoding"?
+
+El "vibecoding" es un enfoque de desarrollo que prioriza la velocidad, la iteración y la colaboración fluida entre el desarrollador y las herramientas de IA. En lugar de seguir un plan rígido, el proyecto evoluciona de forma conversacional, permitiendo que la creatividad y la tecnología converjan para construir aplicaciones funcionales rápidamente.
+
+## Funcionalidades Principales
+
+- **Creación de Snippets**: Guarda tus fragmentos de código con título, descripción, lenguaje y tema (claro/oscuro).
+- **Gestión de Visibilidad**: Decide si tus snippets son públicos o privados.
+- **Vista Previa en Vivo**: Visualiza cómo se verá tu snippet antes de guardarlo, ajustando la altura y otras opciones.
+- **Compartir e Incrustar**: Genera enlaces directos o código `iframe` para incrustar tus snippets en cualquier sitio web.
+- **Autenticación y Almacenamiento**: Utiliza Firebase para la gestión de usuarios y el almacenamiento seguro de datos en Firestore.
+
+## Stack Tecnológico
+
+Este proyecto integra un conjunto de tecnologías modernas, elegidas por su eficiencia y escalabilidad:
 
 - **Framework**: Next.js (App Router)
-- **AI**: Google Gemini
-- **Backend**: Firebase (Authentication & Firestore)
-- **UI**: ShadCN UI Components & Tailwind CSS
-- **Deployment**: Vercel
+- **Inteligencia Artificial**: Google Gemini
+- **Backend y Base de Datos**: Firebase (Authentication & Firestore)
+- **UI/UX**: ShadCN UI y Tailwind CSS para un diseño elegante y responsivo.
+- **Entorno de Desarrollo**: Firebase Studio
 
-## Deploy to Vercel
-
-Follow these steps to deploy your own version of this project to Vercel.
-
-### 1. Fork the Repository
-
-Start by forking this repository to your own GitHub account.
-
-### 2. Create a Vercel Project
-
-- Go to your Vercel dashboard and click "Add New... > Project".
-- Import the repository you just forked.
-- Vercel will automatically detect that it's a Next.js project.
-
-### 3. Configure Environment Variables
-
-Before deploying, you need to set up the environment variables. Vercel will prompt you for these.
-
-You will need the following values from your Firebase project's settings:
-
-- Go to `Project Settings` > `General` > `Your apps` > `SDK setup and configuration`.
-- Select `Config` and you will see the Firebase configuration object.
-
-```
-NEXT_PUBLIC_FIREBASE_PROJECT_ID="<YOUR_PROJECT_ID>"
-NEXT_PUBLIC_FIREBASE_APP_ID="<YOUR_APP_ID>"
-NEXT_PUBLIC_FIREBASE_API_KEY="<YOUR_API_KEY>"
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="<YOUR_AUTH_DOMAIN>"
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="<YOUR_MESSAGING_SENDER_ID>"
-```
-
-### 4. Deploy
-
-Once the environment variables are set, click the "Deploy" button. Vercel will handle the rest, including installing dependencies and running the build. Your site will be live in a few minutes!
+Este proyecto no solo es una herramienta funcional, sino también una demostración de lo que es posible lograr cuando la visión de un desarrollador se combina con el poder de la inteligencia artificial generativa.

@@ -73,6 +73,8 @@ function EmbedPageContent({ id }: { id: string }) {
   if (!snippet) {
     notFound();
   }
+  
+  const embedUrl = `/embed/${snippet.id}`;
 
   return (
     <div className="p-4 sm:p-6 md:p-8">
@@ -98,7 +100,7 @@ function EmbedPageContent({ id }: { id: string }) {
           />
         </CardContent>
         <CardFooter className="bg-muted/50 px-4 py-2">
-            <Link href="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
+            <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
                 <span>Powered by</span>
                 <Logo width={100} height={25} />
             </Link>

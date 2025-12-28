@@ -17,11 +17,13 @@ import { useFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/icons';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from '@/hooks/use-translation';
 
 function LoginPageContent() {
   const { auth } = useFirebase();
   const { toast } = useToast();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,7 +35,7 @@ function LoginPageContent() {
     if (!auth) {
       toast({
         variant: 'destructive',
-        title: 'Error',
+        title: t('toast_error_title'),
         description: 'Firebase not initialized.',
       });
       return;
@@ -49,20 +51,18 @@ function LoginPageContent() {
         password
       );
       
-      // onAuthStateChanged in FirebaseProvider will handle the user state update.
-      // Redirect will be handled by the layout.
       router.push('/dashboard');
 
     } catch (error: any) {
       console.error(error);
       const errorMessage =
         error.code === 'auth/invalid-credential'
-          ? 'Invalid email or password.'
-          : error.message || 'An unexpected error occurred. Please try again.';
+          ? t('login_error_invalid_credentials')
+          : error.message || t('toast_error_title');
       setError(errorMessage);
       toast({
         variant: 'destructive',
-        title: 'Authentication Failed',
+        title: t('login_error_title'),
         description: errorMessage,
       });
     } finally {
@@ -78,19 +78,19 @@ function LoginPageContent() {
         </div>
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
+            <CardTitle className="text-2xl font-headline">{t('login_title')}</CardTitle>
             <CardDescription>
-              Sign in to continue to your CodeEmbed dashboard.
+              {t('login_desc')}
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
+                <Label htmlFor="login-email">{t('email_label')}</Label>
                 <Input
                   id="login-email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder={t('email_placeholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
@@ -98,7 +98,7 @@ function LoginPageContent() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="login-password">Password</Label>
+                <Label htmlFor="login-password">{t('password_label')}</Label>
                 <Input
                   id="login-password"
                   type="password"
@@ -112,7 +112,7 @@ function LoginPageContent() {
             <CardFooter className="flex flex-col gap-4">
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign In
+                {t('login_button')}
               </Button>
             </CardFooter>
           </form>

@@ -74,5 +74,12 @@
     "full_name_placeholder": "Tu nombre completo",
     "email_label": "Correo Electrónico",
     "language_settings_title": "Configuración de Idioma",
-    "language_settings_desc": "Elige el idioma para la interfaz de la aplicación."
+    "language_settings_desc": "Elige el idioma para la interfaz de la aplicación.",
+    "login_title": "Bienvenido de Nuevo",
+    "login_desc": "Inicia sesión para continuar a tu panel de CodeEmbed.",
+    "email_placeholder": "m@ejemplo.com",
+    "password_label": "Contraseña",
+    "login_button": "Iniciar Sesión",
+    "login_error_title": "Fallo de Autenticación",
+    "login_error_invalid_credentials": "Correo electrónico o contraseña inválidos."
 }

@@ -93,5 +93,6 @@
     "show_title_desc": "Incluye el título del snippet en la incrustación.",
     "show_description_label": "Mostrar Descripción",
     "show_description_desc": "Incluye la descripción del snippet en la incrustación.",
-    "views_count": "{{count}} {{count, plural, one {vista} other {vistas}}}"
+    "view_one": "1 vista",
+    "view_other": "{{count}} vistas"
 }

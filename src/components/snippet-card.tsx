@@ -10,6 +10,7 @@ export function SnippetCard({ snippet }: { snippet: Snippet }) {
   const { t } = useTranslation();
 
   const viewCount = snippet.viewCount || 0;
+  const viewsText = viewCount === 1 ? t('view_one') : t('view_other', { count: viewCount });
 
   return (
     <Card className="flex flex-col justify-between transition-all hover:shadow-lg hover:-translate-y-1 h-full">
@@ -19,7 +20,7 @@ export function SnippetCard({ snippet }: { snippet: Snippet }) {
             <CardTitle className="font-headline text-xl leading-tight">{snippet.title}</CardTitle>
             <CardDescription className="flex items-center gap-1.5 text-sm">
                 <Eye className="h-4 w-4" />
-                <span>{t('views_count', { count: viewCount })}</span>
+                <span>{viewsText}</span>
             </CardDescription>
           </div>
         </div>

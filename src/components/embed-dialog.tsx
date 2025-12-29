@@ -37,14 +37,12 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
   
   const queryParams = new URLSearchParams();
-  if (!showTitle) {
-    queryParams.set('showTitle', 'false');
-  }
+  queryParams.set('showTitle', String(showTitle));
   
-  const queryString = queryParams.toString();
-  const embedUrl = `${baseUrl}/embed/${snippet.id}${queryString ? `?${queryString}` : ''}`;
+  const embedUrl = `${baseUrl}/embed/${snippet.id}?${queryParams.toString()}`;
+  const directLinkUrl = `${baseUrl}/s/${snippet.id}`;
   
-  const iframeCode = `<iframe src="${embedUrl}" style="width:100%;border:0;" loading="lazy" allowfullscreen></iframe>`;
+  const iframeCode = `<iframe src="${embedUrl}" style="width:100%; border:0; height: 350px;" loading="lazy" allowfullscreen></iframe>`;
 
   const handleCopy = (textToCopy: string, type: 'code' | 'link') => {
     navigator.clipboard.writeText(textToCopy);
@@ -102,12 +100,12 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
                 <div className="grid w-full items-center gap-1.5">
                     <Label htmlFor="direct-link">{t('direct_link')}</Label>
                     <div className="flex items-center space-x-2">
-                        <Input id="direct-link" value={embedUrl} readOnly />
+                        <Input id="direct-link" value={directLinkUrl} readOnly />
                         <Button
                             type="button"
                             size="icon"
                             variant="outline"
-                            onClick={() => handleCopy(embedUrl, 'link')}
+                            onClick={() => handleCopy(directLinkUrl, 'link')}
                         >
                             {hasCopiedLink ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
                         </Button>

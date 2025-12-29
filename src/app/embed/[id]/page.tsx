@@ -9,20 +9,36 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useEffect } from 'react';
 import { SnippetEmbedView } from '@/components/snippet-embed-view';
-import { SnippetLinkView } from '@/components/snippet-link-view';
+import { useTranslation } from '@/hooks/use-translation';
 
 
 type Props = {
   params: { id: string };
 };
 
+function PrivateSnippetNotice() {
+    const { t } = useTranslation();
+    return (
+      <div className="flex items-center justify-center h-full p-4">
+        <Card className="w-full max-w-lg text-center">
+          <CardHeader>
+            <CardHeader.Title>{t('private_snippet_warning_title')}</CardHeader.Title>
+          </CardHeader>
+          <CardContent>
+            <p>{t('private_snippet_embed_warning')}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+}
+
+
 export default function EmbedPage({ params }: Props) {
   const { firestore } = useFirebase();
   const searchParams = useSearchParams();
 
   // Determine view type. If showTitle is present, it's the iframe view.
-  const isIframeView = searchParams.has('showTitle');
-  const showTitleInFooter = searchParams.get('showTitle') !== 'false';
+  const showTitle = searchParams.get('showTitle') === 'true';
   
   const snippetRef = useMemoFirebase(
     () => (firestore ? doc(firestore, 'snippets', params.id) : null),
@@ -79,28 +95,12 @@ export default function EmbedPage({ params }: Props) {
   }
   
   if (snippet && !snippet.isPublic) {
-      return (
-          <div className="flex items-center justify-center h-full p-4">
-              <Card className="w-full max-w-lg text-center">
-                  <CardHeader>
-                      <CardTitle>Snippet Privado</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                      <p>Este snippet es privado y no puede ser incrustado.</p>
-                  </CardContent>
-              </Card>
-          </div>
-      );
+      return <PrivateSnippetNotice />;
   }
 
   if (!snippet) {
       return null;
   }
 
-  if (isIframeView) {
-      return <SnippetEmbedView snippet={snippet} showTitle={showTitleInFooter} />
-  }
-
-  return <SnippetLinkView snippet={snippet} />
+  return <SnippetEmbedView snippet={snippet} showTitle={showTitle} />
 }
-

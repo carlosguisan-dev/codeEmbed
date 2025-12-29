@@ -89,6 +89,8 @@
     "landing_cta_button": "Empezar ahora",
     "powered_by": "Snippet alojado en",
     "private_snippet_warning": "Este snippet es privado. Para poder compartirlo o incrustarlo, primero debes cambiar su visibilidad a 'Público' en la configuración.",
+    "private_snippet_warning_title": "Snippet Privado",
+    "private_snippet_embed_warning": "Este snippet es privado y no puede ser incrustado.",
     "show_title_label": "Mostrar Título",
     "show_title_desc": "Incluye el título del snippet en la incrustación.",
     "show_description_label": "Mostrar Descripción",

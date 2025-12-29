@@ -11,17 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
 
-// Define a type for your Web Component's props if it accepts them
-declare global {
-    namespace JSX {
-        interface IntrinsicElements {
-            'code-embed': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-                'snippet-id': string;
-            };
-        }
-    }
-}
-
 
 export default function DebugEmbedsPage() {
   const { t } = useTranslation();
@@ -83,7 +72,7 @@ export default function DebugEmbedsPage() {
             </CardHeader>
             <CardContent>
               <div className="rounded-lg border border-dashed p-4 md:p-6">
-                <code-embed snippet-id={selectedSnippetId}></code-embed>
+                <code-embed key={selectedSnippetId} snippet-id={selectedSnippetId}></code-embed>
               </div>
             </CardContent>
           </Card>

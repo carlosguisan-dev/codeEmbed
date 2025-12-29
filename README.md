@@ -1,4 +1,4 @@
-# CodeEmbed - Un Proyecto de Vibecoding con IA
+# CodeEmbed: Un Proyecto de Vibecoding con IA
 
 `CodeEmbed` es una aplicación web moderna para gestionar, compartir e incrustar fragmentos de código, creada como parte de una sesión de "vibecoding". Este proyecto demuestra el poder del desarrollo rápido de aplicaciones (RAD) utilizando herramientas de última generación y la colaboración con una IA de codificación.
 

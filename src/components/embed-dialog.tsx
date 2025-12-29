@@ -19,6 +19,7 @@ import type { Snippet } from '@/lib/definitions';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from './ui/textarea';
 
 interface EmbedDialogProps {
   snippet: Snippet | null;
@@ -42,7 +43,11 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   });
 
   const embedUrl = `${baseUrl}/embed/${snippet.id}?${queryParams.toString()}`;
-  const iframeCode = `<iframe src="${embedUrl}" style="width:100%;border:0;border-radius:4px;overflow:hidden;" title="${snippet.title}" allow="clipboard-write" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>`;
+  const resizerScript = `<script src="${baseUrl}/embed-resizer.js" async></script>`;
+  const iframeCode = `<iframe src="${embedUrl}" data-code-embed-id="${snippet.id}" style="width:100%;border:0;border-radius:4px;overflow:hidden;" title="${snippet.title}" allow="clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe>`;
+
+  const fullEmbedCode = `${iframeCode}\n${resizerScript}`;
+
 
   useEffect(() => {
     // When a new snippet is passed, reset the toggles to their default state
@@ -58,8 +63,8 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   };
 
   const options = [
-    { id: 'link', label: t('direct_link'), value: embedUrl },
-    { id: 'iframe', label: t('iframe_embed'), value: iframeCode },
+    { id: 'link', label: t('direct_link'), value: embedUrl, isTextarea: false },
+    { id: 'iframe', label: t('iframe_embed'), value: fullEmbedCode, isTextarea: true },
   ];
 
   return (
@@ -96,16 +101,27 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
                     <div key={option.id} className="grid w-full items-center gap-1.5">
                     <Label htmlFor={option.id}>{option.label}</Label>
                     <div className="flex items-center gap-2">
-                        <Input
-                        id={option.id}
-                        value={option.value}
-                        readOnly
-                        className="font-code text-sm"
-                        />
+                        {option.isTextarea ? (
+                             <Textarea
+                                id={option.id}
+                                value={option.value}
+                                readOnly
+                                className="font-code text-sm min-h-[120px]"
+                             />
+                        ) : (
+                            <Input
+                                id={option.id}
+                                value={option.value}
+                                readOnly
+                                className="font-code text-sm"
+                            />
+                        )}
+
                         <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => copyToClipboard(option.value, option.id)}
+                            size="icon"
+                            variant="outline"
+                            onClick={() => copyToClipboard(option.value, option.id)}
+                            className="shrink-0"
                         >
                         {copied === option.id ? (
                             <Check className="h-4 w-4 text-primary" />

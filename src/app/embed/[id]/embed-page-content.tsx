@@ -16,7 +16,7 @@ import { useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import type { Snippet } from '@/lib/definitions';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Logo } from '@/components/icons';
 import { useTranslation } from '@/hooks/use-translation';
 
@@ -25,6 +25,8 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
   const { firestore } = useFirebase();
   const { t } = useTranslation();
   const searchParams = useSearchParams();
+  const embedRef = useRef<HTMLDivElement>(null);
+
 
   const showTitle = searchParams.get('showTitle') !== 'false';
   const showDescription = searchParams.get('showDescription') !== 'false';
@@ -39,6 +41,21 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
   });
 
   const displaySnippet = snippet || initialSnippet;
+
+  useEffect(() => {
+    // This effect sends the height of the content to the parent window
+    // which can be used to resize the iframe.
+    if (embedRef.current) {
+        const height = embedRef.current.scrollHeight;
+        window.parent.postMessage({
+            type: 'code-embed-resize',
+            payload: {
+                id: displaySnippet.id,
+                height: height
+            }
+        }, '*');
+    }
+  });
 
 
   useEffect(() => {
@@ -93,14 +110,14 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
 
   if (isCompact) {
     return (
-      <div className="flex flex-col h-screen">
+      <div ref={embedRef}>
           <CodePreview
             code={displaySnippet.code}
             language={displaySnippet.language}
             theme={displaySnippet.theme}
             showLineNumbers={displaySnippet.lineNumbers}
             isEmbed={true}
-            className="flex-grow rounded-none border-none"
+            className="rounded-none border-none"
           />
         <CardFooter className="bg-muted/50 px-4 py-2 mt-auto">
             <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
@@ -113,7 +130,7 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
   }
 
   return (
-    <div className="p-4 sm:p-6 md:p-8">
+    <div ref={embedRef} className="p-4 sm:p-6 md:p-8">
       <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl overflow-hidden">
         {(showTitle || showDescription) && (
             <CardHeader>

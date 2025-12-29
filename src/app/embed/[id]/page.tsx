@@ -4,6 +4,8 @@ import type { Snippet } from '@/lib/definitions';
 import { Metadata, ResolvingMetadata } from 'next';
 import { getFirebaseAdmin } from '@/lib/firebase-admin';
 import EmbedPageContent from './embed-page-content';
+import { Timestamp } from 'firebase-admin/firestore';
+
 
 type Props = {
   params: { id: string };
@@ -19,7 +21,7 @@ async function getSnippet(id: string): Promise<Snippet | null> {
             return null;
         }
 
-        const snippetData = snippetDoc.data() as Omit<Snippet, 'id'>;
+        const snippetData = snippetDoc.data() as Omit<Snippet, 'id' | 'createdAt' | 'updatedAt'> & { createdAt: Timestamp, updatedAt: Timestamp};
 
         // Ensure that the snippet is public before returning it
         if (!snippetData.isPublic) {
@@ -30,8 +32,8 @@ async function getSnippet(id: string): Promise<Snippet | null> {
             id: snippetDoc.id,
             ...snippetData,
             // Firestore Timestamps need to be converted to strings for serialization
-            createdAt: snippetData.createdAt.toString(),
-            updatedAt: snippetData.updatedAt.toString(),
+            createdAt: snippetData.createdAt.toDate().toISOString(),
+            updatedAt: snippetData.updatedAt.toDate().toISOString(),
         };
     } catch (error) {
         console.error("Error fetching snippet server-side:", error);

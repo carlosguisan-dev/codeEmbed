@@ -93,7 +93,7 @@ export function CodePreview({
       </div>
       
       <pre className="p-4 overflow-auto">
-        <code className="font-code text-sm">
+        <code className="font-code text-sm whitespace-pre-wrap">
           {showLineNumbers ? (
             <div className="flex">
               <div className="text-right select-none opacity-50 pr-4">

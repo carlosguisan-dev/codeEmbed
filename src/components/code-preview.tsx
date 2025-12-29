@@ -52,6 +52,7 @@ export function CodePreview({
       className={cn(
         'relative group rounded-lg border text-sm overflow-hidden font-code',
         theme === 'dark' ? 'dark bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200',
+        isEmbed ? '!rounded-none !border-0' : '',
         className
       )}
     >

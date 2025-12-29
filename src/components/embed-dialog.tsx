@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check, Copy, Lock, Info } from 'lucide-react';
+import { Check, Copy, Lock, Info, Link as LinkIcon } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import type { Snippet } from '@/lib/definitions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -44,7 +44,6 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
 
   const embedUrl = `${baseUrl}/embed/${snippet.id}?${queryParams.toString()}`;
   
-  // The iframe now includes a data-attribute for the resizer script to find it.
   const iframeCode = `<iframe src="${embedUrl}" data-code-embed-id="${snippet.id}" style="width:100%; border:0; overflow:hidden;" title="${snippet.title}" allow="clipboard-write" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>`;
   const resizerScriptCode = `<script src="${baseUrl}/embed-resizer.js" async></script>`;
 
@@ -61,11 +60,6 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const options = [
-    { id: 'iframe', label: t('iframe_embed'), value: iframeCode, isTextarea: true },
-    { id: 'script_embed', label: t('script_embed'), value: resizerScriptCode, isTextarea: false },
-  ];
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[625px]">
@@ -76,66 +70,77 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
         
         {snippet.isPublic ? (
             <>
-              <div className="space-y-4 pt-4">
-                <div className="flex items-center justify-between">
-                    <Label htmlFor="showTitle" className="flex flex-col">
-                        <span>{t('show_title_label')}</span>
-                        <span className="font-normal text-sm text-muted-foreground">{t('show_title_desc')}</span>
-                    </Label>
-                    <Switch id="showTitle" checked={showTitle} onCheckedChange={setShowTitle} />
-                </div>
-                <div className="flex items-center justify-between">
-                    <Label htmlFor="showDescription" className="flex flex-col">
-                        <span>{t('show_description_label')}</span>
-                        <span className="font-normal text-sm text-muted-foreground">{t('show_description_desc')}</span>
-                    </Label>
-                    <Switch id="showDescription" checked={showDescription} onCheckedChange={setShowDescription} />
-                </div>
-              </div>
-
-              <Separator className="my-4" />
-
-              <div className="grid gap-4">
-                {options.map(option => (
-                    <div key={option.id} className="grid w-full items-center gap-1.5">
-                    <Label htmlFor={option.id}>{option.label}</Label>
-                    <div className="flex items-center gap-2">
-                        {option.isTextarea ? (
-                             <Textarea
-                                id={option.id}
-                                value={option.value}
-                                readOnly
-                                className="font-code text-sm min-h-[100px] resize-none"
-                             />
-                        ) : (
-                            <Input
-                                id={option.id}
-                                value={option.value}
-                                readOnly
-                                className="font-code text-sm"
-                            />
-                        )}
-
+                <Alert>
+                    <LinkIcon className="h-4 w-4" />
+                    <AlertTitle>oEmbed URL</AlertTitle>
+                    <AlertDescription>
+                        Pega este enlace en plataformas compatibles (como Medium, Ghost, etc.) para incrustar el snippet automáticamente.
+                    </AlertDescription>
+                     <div className="flex items-center gap-2 pt-2">
+                        <Input
+                            id="oembed-url"
+                            value={embedUrl}
+                            readOnly
+                            className="font-code text-sm"
+                        />
                         <Button
                             size="icon"
                             variant="outline"
-                            onClick={() => copyToClipboard(option.value, option.id)}
+                            onClick={() => copyToClipboard(embedUrl, 'oembed-url')}
                             className="shrink-0"
                         >
-                        {copied === option.id ? (
+                        {copied === 'oembed-url' ? (
                             <Check className="h-4 w-4 text-primary" />
                         ) : (
                             <Copy className="h-4 w-4" />
                         )}
                         </Button>
                     </div>
-                    </div>
-                ))}
-                <Alert>
+                </Alert>
+
+              <Separator className="my-4" />
+
+              <div className="space-y-2">
+                 <Label className="font-medium">Opciones de Incrustación Manual</Label>
+                 <div className="flex items-center justify-between">
+                    <Label htmlFor="showTitle" className="flex flex-col">
+                        <span>{t('show_title_label')}</span>
+                    </Label>
+                    <Switch id="showTitle" checked={showTitle} onCheckedChange={setShowTitle} />
+                </div>
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="showDescription" className="flex flex-col">
+                        <span>{t('show_description_label')}</span>
+                    </Label>
+                    <Switch id="showDescription" checked={showDescription} onCheckedChange={setShowDescription} />
+                </div>
+              </div>
+
+
+              <div className="grid gap-4 mt-4">
+                <div className="grid w-full items-center gap-1.5">
+                    <Label htmlFor="iframe-code">1. Pega el código del Iframe</Label>
+                     <Textarea
+                        id="iframe-code"
+                        value={iframeCode}
+                        readOnly
+                        className="font-code text-sm min-h-[100px] resize-none"
+                     />
+                </div>
+                <div className="grid w-full items-center gap-1.5">
+                    <Label htmlFor="script-code">2. Añade el script de redimensionamiento (una vez por página)</Label>
+                    <Input
+                        id="script-code"
+                        value={resizerScriptCode}
+                        readOnly
+                        className="font-code text-sm"
+                    />
+                </div>
+                <Alert variant="destructive">
                     <Info className="h-4 w-4" />
                     <AlertTitle>¡Importante!</AlertTitle>
                     <AlertDescription>
-                        Para que la altura del snippet se ajuste automáticamente, pega el Iframe en tu contenido y el Script una sola vez en tu página, antes de la etiqueta &lt;/body&gt;.
+                        Para que la altura del snippet se ajuste automáticamente, pega el Iframe en tu contenido y el Script una sola vez en tu página, preferiblemente antes de la etiqueta &lt;/body&gt;.
                     </AlertDescription>
                 </Alert>
               </div>

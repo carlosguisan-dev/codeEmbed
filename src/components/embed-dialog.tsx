@@ -43,11 +43,7 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   });
 
   const embedUrl = `${baseUrl}/embed/${snippet.id}?${queryParams.toString()}`;
-  const resizerScript = `<script src="${baseUrl}/embed-resizer.js" async></script>`;
-  const iframeCode = `<iframe src="${embedUrl}" data-code-embed-id="${snippet.id}" style="width:100%;border:0;border-radius:4px;overflow:hidden;" title="${snippet.title}" allow="clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe>`;
-
-  const fullEmbedCode = `${iframeCode}\n${resizerScript}`;
-
+  const iframeCode = `<iframe src="${embedUrl}" style="width:100%;border:0;border-radius:4px;overflow:hidden;" title="${snippet.title}" allow="clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe>`;
 
   useEffect(() => {
     // When a new snippet is passed, reset the toggles to their default state
@@ -64,7 +60,7 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
 
   const options = [
     { id: 'link', label: t('direct_link'), value: embedUrl, isTextarea: false },
-    { id: 'iframe', label: t('iframe_embed'), value: fullEmbedCode, isTextarea: true },
+    { id: 'iframe', label: t('iframe_embed'), value: iframeCode, isTextarea: true },
   ];
 
   return (

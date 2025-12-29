@@ -1,11 +1,14 @@
+
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Check, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/use-translation';
 import { Textarea } from './ui/textarea';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomDark, a11yLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 type CodePreviewProps = {
   code: string;
@@ -30,8 +33,6 @@ export function CodePreview({
 }: CodePreviewProps) {
   const [hasCopied, setHasCopied] = useState(false);
   const { t } = useTranslation();
-  const lineNumbersRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -39,28 +40,37 @@ export function CodePreview({
     setTimeout(() => setHasCopied(false), 2000);
   };
   
-  const handleScroll = () => {
-    if (lineNumbersRef.current && textareaRef.current) {
-      lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
-    }
-  };
+  const selectedTheme = theme === 'dark' ? atomDark : a11yLight;
 
-  const lines = code.split('\n');
+  if (isEditable) {
+    return (
+      <div className={cn('relative group rounded-lg border text-sm overflow-hidden font-code', className)}>
+        <Textarea
+          value={code}
+          onChange={(e) => onCodeChange?.(e.target.value)}
+          className={cn(
+            'flex-1 resize-none !border-0 !ring-0 !outline-none p-4 whitespace-pre-wrap break-words font-code min-h-[300px]',
+            theme === 'dark' ? 'bg-gray-900 text-gray-300' : 'bg-gray-50 text-gray-800'
+          )}
+          placeholder="// Your code here"
+        />
+      </div>
+    );
+  }
 
   return (
     <div
       className={cn(
         'relative group rounded-lg border text-sm overflow-hidden font-code',
-        theme === 'dark' ? 'dark bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200',
+        theme === 'dark' ? 'dark' : '',
         isEmbed ? '!rounded-none !border-0' : '',
         className
       )}
     >
-      <div className="flex items-center justify-between px-4 py-2 border-b"
-        style={{
-            borderColor: theme === 'dark' ? 'var(--border)' : 'hsl(var(--border))'
-        }}
-      >
+      <div className={cn(
+        'flex items-center justify-between px-4 py-2 border-b',
+        theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'
+      )}>
         <span className={cn('text-xs font-semibold', theme === 'dark' ? 'text-gray-400' : 'text-gray-600')}>
           {language}
         </span>
@@ -79,40 +89,27 @@ export function CodePreview({
           <span className="ml-2">{hasCopied ? t('copied') : t('copy')}</span>
         </Button>
       </div>
-      <div className={cn('relative flex', theme === 'dark' ? 'text-gray-300' : 'text-gray-800')}>
-          {showLineNumbers && (
-            <div 
-                ref={lineNumbersRef} 
-                className="text-right pr-4 select-none opacity-50 p-4 sticky top-0 overflow-y-hidden"
-                style={{
-                  height: isEditable ? 'auto' : undefined,
-                  maxHeight: isEditable ? textareaRef.current?.clientHeight : undefined,
-                }}
-            >
-              {lines.map((_, index) => (
-                <div key={index}>{index + 1}</div>
-              ))}
-            </div>
-          )}
-          {isEditable ? (
-            <Textarea
-              ref={textareaRef}
-              value={code}
-              onChange={(e) => onCodeChange?.(e.target.value)}
-              onScroll={handleScroll}
-              className={cn(
-                'flex-1 resize-none !border-0 !ring-0 !outline-none p-4 whitespace-pre-wrap break-words font-code',
-                theme === 'dark' ? 'bg-gray-900 text-gray-300' : 'bg-gray-50 text-gray-800',
-                showLineNumbers ? '' : 'px-4'
-              )}
-              placeholder="// Your code here"
-            />
-          ) : (
-            <pre className={cn('p-4 whitespace-pre-wrap break-words flex-1')}>
-                <code>{code}</code>
-            </pre>
-          )}
-        </div>
+      
+      <SyntaxHighlighter
+        language={language}
+        style={selectedTheme}
+        showLineNumbers={showLineNumbers}
+        wrapLines={true}
+        wrapLongLines={true}
+        customStyle={{ 
+            margin: 0,
+            padding: '1rem',
+            borderRadius: 0,
+            backgroundColor: theme === 'dark' ? '#0d1117' : '#fafafa'
+        }}
+        codeTagProps={{
+            style: {
+                fontFamily: 'inherit'
+            }
+        }}
+      >
+        {code}
+      </SyntaxHighlighter>
     </div>
   );
 }

@@ -36,12 +36,16 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
   
   const queryParams = new URLSearchParams();
-  if (!showTitle) queryParams.set('showTitle', 'false');
-  if (!showDescription) queryParams.set('showDescription', 'false');
+  if (!showTitle) {
+    queryParams.set('showTitle', 'false');
+  }
+  if (!showDescription) {
+    queryParams.set('showDescription', 'false');
+  }
   
-  const embedUrl = `${baseUrl}/embed/${snippet.id}?${queryParams.toString()}`;
-  const directLink = `${baseUrl}/embed/${snippet.id}`;
-
+  const queryString = queryParams.toString();
+  const embedUrl = `${baseUrl}/embed/${snippet.id}${queryString ? `?${queryString}` : ''}`;
+  
   const iframeCode = `<iframe src="${embedUrl}" style="width:100%;border:0;" loading="lazy" allowfullscreen></iframe>`;
 
   return (
@@ -84,7 +88,7 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
                 <div className="grid w-full items-center gap-1.5">
                     <Label htmlFor="direct-link">{t('direct_link')}</Label>
                     <div className="flex items-center space-x-2">
-                        <Input id="direct-link" value={directLink} readOnly />
+                        <Input id="direct-link" value={embedUrl} readOnly />
                     </div>
                 </div>
                  <Alert>

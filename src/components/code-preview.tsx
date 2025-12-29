@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/use-translation';
 import { Textarea } from './ui/textarea';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { a11yDark, a11yLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 type CodePreviewProps = {
   code: string;
@@ -54,12 +55,13 @@ export function CodePreview({
       </div>
     );
   }
+  
+  const selectedTheme = theme === 'dark' ? a11yDark : a11yLight;
 
   return (
     <div
       className={cn(
         'relative group rounded-lg border text-sm overflow-hidden font-code',
-        theme === 'dark' ? 'dark-theme' : 'light-theme',
         isEmbed ? '!rounded-none !border-0' : '',
         className
       )}
@@ -89,11 +91,15 @@ export function CodePreview({
       
       <SyntaxHighlighter
         language={language}
-        useInlineStyles={false}
+        style={selectedTheme}
         showLineNumbers={showLineNumbers}
         wrapLines={true}
         wrapLongLines={true}
         className="!p-4 !m-0 !rounded-none"
+        customStyle={{
+          backgroundColor: theme === 'dark' ? '#282c34' : '#f9fafb',
+          margin: 0,
+        }}
         codeTagProps={{
             style: {
                 fontFamily: 'inherit'

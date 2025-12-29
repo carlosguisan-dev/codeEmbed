@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { Save, Loader2, Share2, Trash2 } from 'lucide-react';
@@ -32,6 +32,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { cn } from '@/lib/utils';
+import { CodePreview } from './code-preview';
 
 
 interface SnippetFormProps {
@@ -88,7 +89,7 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
 
     const validatedFields = snippetSchema.safeParse(formData);
     if (!validatedFields.success) {
-      toast({ variant: 'destructive', title: t('toast_error_title'), description: validatedFields.error.errors.map(e => e.message).join(', ') });
+      toast({ variant: 'destructive', title: t('toast_error_title'), description: validatedFields.error.map(e => e.message).join(', ') });
       return;
     }
 
@@ -223,24 +224,34 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
         <Card>
             <CardHeader>
                 <CardTitle className="font-headline">{t('code_label')}</CardTitle>
+                <CardDescription>{t('editor_desc')}</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
                 <Textarea
                     id="code"
                     value={formData.code}
                     onChange={handleChange}
                     className={cn(
-                        'font-code min-h-[400px]',
+                        'font-code min-h-[300px]',
                         formData.theme === 'dark' && 'bg-gray-900 text-gray-300 border-gray-700'
                     )}
                     placeholder="// Your code here"
                 />
-                <div className="text-xs text-muted-foreground mt-2 flex justify-end gap-4">
+                 <div className="text-xs text-muted-foreground flex justify-end gap-4">
                     <span>{t('line_counter', { count: lineCount })}</span>
                     <span>{t('char_counter', { count: charCount })}</span>
                 </div>
+
+                <Label className="font-headline">{t('theme_previews_title')}</Label>
+                <CodePreview
+                    code={formData.code || "// Your code will appear here"}
+                    language={formData.language}
+                    theme={formData.theme as 'light' | 'dark'}
+                    showLineNumbers={formData.lineNumbers}
+                />
             </CardContent>
         </Card>
+        
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card>

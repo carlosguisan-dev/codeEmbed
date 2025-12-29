@@ -12,8 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { CodePreview } from './code-preview';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/hooks/use-translation';
 import { Save, Loader2, Share2, Trash2 } from 'lucide-react';
@@ -32,6 +31,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { cn } from '@/lib/utils';
 
 
 interface SnippetFormProps {
@@ -225,7 +225,16 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
                 <CardTitle className="font-headline">{t('code_label')}</CardTitle>
             </CardHeader>
             <CardContent>
-                <Textarea id="code" value={formData.code} onChange={handleChange} className="font-code min-h-[400px]" placeholder="// Your code here" />
+                <Textarea
+                    id="code"
+                    value={formData.code}
+                    onChange={handleChange}
+                    className={cn(
+                        'font-code min-h-[400px]',
+                        formData.theme === 'dark' && 'bg-gray-900 text-gray-300 border-gray-700'
+                    )}
+                    placeholder="// Your code here"
+                />
                 <div className="text-xs text-muted-foreground mt-2 flex justify-end gap-4">
                     <span>{t('line_counter', { count: lineCount })}</span>
                     <span>{t('char_counter', { count: charCount })}</span>
@@ -284,33 +293,9 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
                 </CardContent>
             </Card>
         </div>
-
-        <div className="space-y-6">
-               <Card>
-                <CardHeader>
-                    <CardTitle className="font-headline">{t('theme_previews_title')}</CardTitle>
-                </CardHeader>
-                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <Label className="text-muted-foreground">{t('light_theme_preview')}</Label>
-                        <div className="mt-2 rounded-lg border p-2 bg-muted/30 h-48 overflow-auto">
-                            <CodePreview code={formData.code} language={formData.language} theme="light" showLineNumbers={formData.lineNumbers} />
-                        </div>
-                    </div>
-                    <div>
-                        <Label className="text-muted-foreground">{t('dark_theme_preview')}</Label>
-                        <div className="mt-2 rounded-lg border p-2 bg-muted/30 h-48 overflow-auto">
-                            <CodePreview code={formData.code} language={formData.language} theme="dark" showLineNumbers={formData.lineNumbers} />
-                        </div>
-                    </div>
-                </CardContent>
-              </Card>
-        </div>
       
     </form>
     <EmbedDialog snippet={savedSnippet} open={isEmbedDialogOpen} onOpenChange={setEmbedDialogOpen} />
     </>
   );
 }
-
-    

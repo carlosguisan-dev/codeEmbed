@@ -12,12 +12,12 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Lock, Info, Code, Link as LinkIcon } from 'lucide-react';
+import { Lock, Info } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import type { Snippet } from '@/lib/definitions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Textarea } from './ui/textarea';
-import { Checkbox } from './ui/checkbox';
+import { Switch } from './ui/switch';
 import { Input } from './ui/input';
 
 interface EmbedDialogProps {
@@ -56,13 +56,19 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
             <div className="grid gap-6 mt-4">
                  <div className="space-y-4">
                     <Label>{t('embed_options')}</Label>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="show-title" checked={showTitle} onCheckedChange={(checked) => setShowTitle(Boolean(checked))} />
-                      <Label htmlFor="show-title" className="font-normal">{t('show_title_label')}</Label>
+                    <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="show-title">{t('show_title_label')}</Label>
+                        <p className="text-xs text-muted-foreground">{t('show_title_desc')}</p>
+                      </div>
+                      <Switch id="show-title" checked={showTitle} onCheckedChange={setShowTitle} />
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="show-description" checked={showDescription} onCheckedChange={(checked) => setShowDescription(Boolean(checked))} />
-                      <Label htmlFor="show-description" className="font-normal">{t('show_description_label')}</Label>
+                     <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="show-description">{t('show_description_label')}</Label>
+                        <p className="text-xs text-muted-foreground">{t('show_description_desc')}</p>
+                      </div>
+                      <Switch id="show-description" checked={showDescription} onCheckedChange={setShowDescription} />
                     </div>
                 </div>
 

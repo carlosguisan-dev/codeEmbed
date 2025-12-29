@@ -92,5 +92,6 @@
     "show_title_label": "Show Title",
     "show_title_desc": "Include the snippet's title in the embed.",
     "show_description_label": "Show Description",
-    "show_description_desc": "Include the snippet's description in the embed."
+    "show_description_desc": "Include the snippet's description in the embed.",
+    "views_count": "{{count}} {{count, plural, one {view} other {views}}}"
 }

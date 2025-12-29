@@ -28,12 +28,15 @@ async function getSnippet(id: string): Promise<Snippet | null> {
             return null;
         }
 
-
-        // Ensure that the snippet is public before returning it
+        // Temporarily removed for debugging 404s.
+        // This allows private snippets to be viewed via direct link.
+        // TODO: Re-implement with a proper "This snippet is private" page.
+        /*
         if (snippetData.isPublic !== true) {
             console.log(`Snippet with ID ${id} is not public.`);
             return null;
         }
+        */
         
         // Safely handle Timestamps
         const createdAt = snippetData.createdAt instanceof Timestamp 
@@ -105,4 +108,5 @@ export default async function EmbedPage({ params }: Props) {
   // We pass the server-fetched snippet to the client component
   return <EmbedPageContent snippet={snippet} id={params.id} />;
 }
+
 

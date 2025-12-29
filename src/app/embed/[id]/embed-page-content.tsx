@@ -145,4 +145,3 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
     </div>
   );
 }
-

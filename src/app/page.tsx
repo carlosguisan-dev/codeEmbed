@@ -5,7 +5,7 @@ import { Logo } from '@/components/icons';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import { CodePreview } from '@/components/code-preview';
-import { Card, CardFooter } from '@/components/ui/card';
+import { Card, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function LandingPage() {
   const { t } = useTranslation();
@@ -55,12 +55,16 @@ helloWorld();
 
                <div className="w-full max-w-3xl pt-8">
                   <Card className="w-full border-2 border-primary/20 shadow-xl overflow-hidden text-left">
+                    <CardHeader>
+                        <CardTitle className="font-headline text-2xl">Ejemplo de Snippet</CardTitle>
+                    </CardHeader>
                     <CodePreview
                       code={codeExample}
                       language="javascript"
                       theme="dark"
                       showLineNumbers={true}
                       isEmbed={true}
+                      className="rounded-t-none"
                     />
                     <CardFooter className="bg-muted/50 px-4 py-2">
                       <Link href="/" className="ml-auto flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">

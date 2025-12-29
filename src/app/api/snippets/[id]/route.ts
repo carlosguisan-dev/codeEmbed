@@ -2,11 +2,15 @@
 import { getFirebaseAdmin } from '@/lib/firebase-admin';
 import { NextRequest, NextResponse } from 'next/server';
 
+// Force Node.js runtime to ensure compatibility with Firebase Admin SDK
+export const runtime = 'nodejs';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const snippetId = params.id;
+  console.log(`API request for snippet ID: ${snippetId}`);
 
   if (!snippetId) {
     return NextResponse.json({ error: 'Snippet ID is required' }, { status: 400 });
@@ -44,6 +48,8 @@ export async function GET(
     return NextResponse.json(publicSnippet);
   } catch (error) {
     console.error('API Snippet Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    // Ensure we provide a clear error message in the response
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return NextResponse.json({ error: 'Internal Server Error', details: errorMessage }, { status: 500 });
   }
 }

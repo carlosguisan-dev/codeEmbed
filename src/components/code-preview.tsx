@@ -7,8 +7,6 @@ import { Check, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/use-translation';
 import { Textarea } from './ui/textarea';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { a11yDark, a11yLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 type CodePreviewProps = {
   code: string;
@@ -59,8 +57,8 @@ export function CodePreview({
       </div>
     );
   }
-
-  const syntaxTheme = theme === 'dark' ? a11yDark : a11yLight;
+  
+  const lines = code.split('\n');
 
   return (
     <div
@@ -94,25 +92,26 @@ export function CodePreview({
         </Button>
       </div>
       
-        <SyntaxHighlighter
-            language={language}
-            style={syntaxTheme}
-            showLineNumbers={showLineNumbers}
-            lineNumberStyle={{ minWidth: '2.25em', opacity: 0.5, userSelect: 'none' }}
-            customStyle={{
-                margin: 0,
-                padding: '1rem',
-                backgroundColor: 'transparent',
-                width: '100%',
-                overflow: 'auto',
-            }}
-            codeTagProps={{
-                className: 'font-code text-sm'
-            }}
-            useInlineStyles={false}
-        >
-          {code}
-        </SyntaxHighlighter>
+      <pre className="p-4 overflow-auto">
+        <code className="font-code text-sm">
+          {showLineNumbers ? (
+            <div className="flex">
+              <div className="text-right select-none opacity-50 pr-4">
+                {lines.map((_, index) => (
+                  <div key={index}>{index + 1}</div>
+                ))}
+              </div>
+              <div className="flex-1">
+                {lines.map((line, index) => (
+                  <div key={index}>{line}</div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            code
+          )}
+        </code>
+      </pre>
     </div>
   );
 }

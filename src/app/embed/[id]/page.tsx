@@ -1,4 +1,3 @@
-
 'use client';
 import { notFound, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -83,6 +82,28 @@ function EmbedPageContent({ id }: { id: string }) {
   }
   
   const embedUrl = `/embed/${snippet.id}`;
+  const isCompact = !showTitle && !showDescription;
+
+  if (isCompact) {
+    return (
+      <div className="flex flex-col h-screen">
+          <CodePreview
+            code={snippet.code}
+            language={snippet.language}
+            theme={snippet.theme}
+            showLineNumbers={snippet.lineNumbers}
+            isEmbed={true}
+            className="flex-grow rounded-none border-none"
+          />
+        <CardFooter className="bg-muted/50 px-4 py-2 mt-auto">
+            <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
+                <span>{t('powered_by')}</span>
+                <Logo width={100} height={25} />
+            </Link>
+        </CardFooter>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 sm:p-6 md:p-8">

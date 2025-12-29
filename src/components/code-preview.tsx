@@ -12,9 +12,10 @@ type CodePreviewProps = {
   theme: 'light' | 'dark';
   showLineNumbers: boolean;
   isEmbed?: boolean;
+  className?: string;
 };
 
-export function CodePreview({ code, language, theme, showLineNumbers, isEmbed = false }: CodePreviewProps) {
+export function CodePreview({ code, language, theme, showLineNumbers, isEmbed = false, className }: CodePreviewProps) {
   const [hasCopied, setHasCopied] = useState(false);
   const { t } = useTranslation();
 
@@ -30,7 +31,8 @@ export function CodePreview({ code, language, theme, showLineNumbers, isEmbed = 
     <div
       className={cn(
         'relative group rounded-lg border text-sm overflow-hidden',
-        theme === 'dark' ? 'dark bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
+        theme === 'dark' ? 'dark bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200',
+        className
       )}
     >
       <div className="flex items-center justify-between px-4 py-2 border-b"

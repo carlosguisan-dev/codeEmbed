@@ -113,13 +113,13 @@ export default function EmbedPage({ params }: Props) {
   return (
     <div id="embed-root" className="min-h-0">
       <Card className="w-full max-w-4xl mx-auto border-0 shadow-none overflow-hidden rounded-none">
-        {(showTitle || showDescription) && !isCompact && (
+        {(showTitle || showDescription) && (
             <CardHeader id="embed-header">
               <div className="flex items-start gap-4">
                 {(showTitle || showDescription) && <FileText className="w-8 h-8 text-primary mt-1 flex-shrink-0" />}
                 <div className="flex-grow">
                   {showTitle && <CardTitle className="font-headline text-2xl">{snippet.title}</CardTitle>}
-                  {showDescription && <CardDescription className="mt-1">{snippet.description}</CardDescription>}
+                  {showDescription && snippet.description && <CardDescription className="mt-1">{snippet.description}</CardDescription>}
                 </div>
               </div>
             </CardHeader>

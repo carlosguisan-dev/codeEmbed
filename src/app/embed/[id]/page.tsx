@@ -6,6 +6,7 @@ import { doc } from 'firebase/firestore';
 import { useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import EmbedPageContent from './embed-page-content';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 type Props = {
   params: { id: string };

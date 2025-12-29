@@ -136,7 +136,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
       </head>
       <body className={cn("font-body antialiased", workSans.variable, firaCode.variable)}>
         <FirebaseClientProvider>

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -17,11 +16,16 @@ export default function DebugEmbedsPage() {
   const { isUserLoading, firestore, user } = useFirebase();
   const [selectedSnippetId, setSelectedSnippetId] = useState<string | null>(null);
 
+  // Query for PUBLIC snippets created by the current user.
   const snippetsQuery = useMemoFirebase(() => {
     if (!firestore || !user) {
       return null;
     }
-    return query(collection(firestore, 'snippets'), where('userId', '==', user.uid));
+    return query(
+        collection(firestore, 'snippets'), 
+        where('userId', '==', user.uid),
+        where('isPublic', '==', true) // Only fetch public snippets
+    );
   }, [firestore, user]);
 
   const { data: snippets, isLoading: areSnippetsLoading } = useCollection<Snippet>(snippetsQuery);
@@ -51,11 +55,17 @@ export default function DebugEmbedsPage() {
                   <SelectValue placeholder={t('select_snippet_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {snippets?.map((snippet) => (
-                    <SelectItem key={snippet.id} value={snippet.id}>
-                      {snippet.title} ({snippet.language})
-                    </SelectItem>
-                  ))}
+                  {snippets && snippets.length > 0 ? (
+                    snippets.map((snippet) => (
+                      <SelectItem key={snippet.id} value={snippet.id}>
+                        {snippet.title} ({snippet.language})
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-sm text-muted-foreground">
+                      You have no public snippets to debug.
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             )}

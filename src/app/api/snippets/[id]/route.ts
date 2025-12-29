@@ -9,7 +9,7 @@ export async function GET(
   const snippetId = params.id;
 
   if (!snippetId) {
-    return new NextResponse('Snippet ID is required', { status: 400 });
+    return NextResponse.json({ error: 'Snippet ID is required' }, { status: 400 });
   }
 
   try {
@@ -17,17 +17,16 @@ export async function GET(
     const snippetDoc = await db.collection('snippets').doc(snippetId).get();
 
     if (!snippetDoc.exists) {
-      return new NextResponse('Snippet not found', { status: 404 });
+       return NextResponse.json({ error: 'Snippet not found' }, { status: 404 });
     }
 
     const snippetData = snippetDoc.data();
     if (!snippetData) {
-        return new NextResponse('Snippet data not found', { status: 404 });
+        return NextResponse.json({ error: 'Snippet data not found' }, { status: 404 });
     }
     
-    // IMPORTANT: Only serve public snippets through this API
     if (snippetData.isPublic !== true) {
-         return new NextResponse('This snippet is private and cannot be accessed via the API.', { status: 403 });
+         return NextResponse.json({ error: 'This snippet is private and cannot be accessed via the API.' }, { status: 403 });
     }
     
     // We don't need to convert timestamps, JSON serialization handles it.
@@ -45,6 +44,6 @@ export async function GET(
     return NextResponse.json(publicSnippet);
   } catch (error) {
     console.error('API Snippet Error:', error);
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

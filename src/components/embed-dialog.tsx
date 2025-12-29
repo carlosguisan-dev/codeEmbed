@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -13,10 +13,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check, Copy, Link as LinkIcon, Lock } from 'lucide-react';
+import { Check, Copy, Lock } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import type { Snippet } from '@/lib/definitions';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
 
 interface EmbedDialogProps {
   snippet: Snippet | null;
@@ -27,12 +29,27 @@ interface EmbedDialogProps {
 export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState<string | null>(null);
+  const [showTitle, setShowTitle] = useState(true);
+  const [showDescription, setShowDescription] = useState(true);
 
   if (!snippet) return null;
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-  const embedUrl = `${baseUrl}/embed/${snippet.id}`;
-  const iframeCode = `<iframe src="${embedUrl}" style="width:100%;height:300px;border:0;border-radius:4px;overflow:hidden;" title="${snippet.title}" allow="clipboard-write" sandbox="allow-scripts allow-same-origin"></iframe>`;
+  
+  const queryParams = new URLSearchParams({
+    showTitle: String(showTitle),
+    showDescription: String(showDescription),
+  });
+
+  const embedUrl = `${baseUrl}/embed/${snippet.id}?${queryParams.toString()}`;
+  const iframeCode = `<iframe src="${embedUrl}" style="width:100%;border:0;border-radius:4px;overflow:hidden;" title="${snippet.title}" allow="clipboard-write" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>`;
+
+  useEffect(() => {
+    // When a new snippet is passed, reset the toggles to their default state
+    setShowTitle(true);
+    setShowDescription(true);
+  }, [snippet]);
+
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -54,37 +71,58 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
         </DialogHeader>
         
         {snippet.isPublic ? (
-            <div className="grid gap-4 py-4">
-            {options.map(option => (
-                <div key={option.id} className="grid w-full items-center gap-1.5">
-                <Label htmlFor={option.id}>{option.label}</Label>
-                <div className="flex items-center gap-2">
-                    <Input
-                    id={option.id}
-                    value={option.value}
-                    readOnly
-                    className="font-code text-sm"
-                    />
-                    <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => copyToClipboard(option.value, option.id)}
-                    >
-                    {copied === option.id ? (
-                        <Check className="h-4 w-4 text-primary" />
-                    ) : (
-                        <Copy className="h-4 w-4" />
-                    )}
-                    </Button>
+            <>
+              <div className="space-y-4 pt-4">
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="showTitle" className="flex flex-col">
+                        <span>{t('show_title_label')}</span>
+                        <span className="font-normal text-sm text-muted-foreground">{t('show_title_desc')}</span>
+                    </Label>
+                    <Switch id="showTitle" checked={showTitle} onCheckedChange={setShowTitle} />
                 </div>
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="showDescription" className="flex flex-col">
+                        <span>{t('show_description_label')}</span>
+                        <span className="font-normal text-sm text-muted-foreground">{t('show_description_desc')}</span>
+                    </Label>
+                    <Switch id="showDescription" checked={showDescription} onCheckedChange={setShowDescription} />
                 </div>
-            ))}
-            </div>
+              </div>
+
+              <Separator className="my-4" />
+
+              <div className="grid gap-4">
+                {options.map(option => (
+                    <div key={option.id} className="grid w-full items-center gap-1.5">
+                    <Label htmlFor={option.id}>{option.label}</Label>
+                    <div className="flex items-center gap-2">
+                        <Input
+                        id={option.id}
+                        value={option.value}
+                        readOnly
+                        className="font-code text-sm"
+                        />
+                        <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => copyToClipboard(option.value, option.id)}
+                        >
+                        {copied === option.id ? (
+                            <Check className="h-4 w-4 text-primary" />
+                        ) : (
+                            <Copy className="h-4 w-4" />
+                        )}
+                        </Button>
+                    </div>
+                    </div>
+                ))}
+              </div>
+            </>
         ) : (
             <Alert variant="default" className="mt-4">
                 <Lock className="h-4 w-4" />
                 <AlertDescription>
-                    Este snippet es privado. Para poder compartirlo o incrustarlo, primero debes cambiar su visibilidad a "Público" en la configuración.
+                    {t('private_snippet_warning')}
                 </AlertDescription>
             </Alert>
         )}

@@ -1,5 +1,6 @@
+
 'use client';
-import { notFound } from 'next/navigation';
+import { notFound, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CodePreview } from '@/components/code-preview';
 import {
@@ -23,6 +24,11 @@ import { useTranslation } from '@/hooks/use-translation';
 function EmbedPageContent({ id }: { id: string }) {
   const { firestore } = useFirebase();
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+
+  const showTitle = searchParams.get('showTitle') !== 'false';
+  const showDescription = searchParams.get('showDescription') !== 'false';
+
   const snippetRef = useMemoFirebase(
     () => (firestore ? doc(firestore, 'snippets', id) : null),
     [firestore, id]
@@ -81,17 +87,17 @@ function EmbedPageContent({ id }: { id: string }) {
   return (
     <div className="p-4 sm:p-6 md:p-8">
       <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl overflow-hidden">
-        <CardHeader>
-          <div className="flex items-start gap-4">
-            <FileText className="w-8 h-8 text-primary mt-1" />
-            <div>
-              <CardTitle className="font-headline text-2xl">
-                {snippet.title}
-              </CardTitle>
-              <CardDescription>{snippet.description}</CardDescription>
+        {(showTitle || showDescription) && (
+            <CardHeader>
+            <div className="flex items-start gap-4">
+                {(showTitle || showDescription) && <FileText className="w-8 h-8 text-primary mt-1" />}
+                <div>
+                {showTitle && <CardTitle className="font-headline text-2xl">{snippet.title}</CardTitle>}
+                {showDescription && <CardDescription>{snippet.description}</CardDescription>}
+                </div>
             </div>
-          </div>
-        </CardHeader>
+            </CardHeader>
+        )}
         <CardContent>
           <CodePreview
             code={snippet.code}

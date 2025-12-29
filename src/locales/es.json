@@ -1,3 +1,4 @@
+
 {
     "app_name": "CodeEmbed",
     "dashboard_title": "Panel de control",
@@ -86,5 +87,10 @@
     "landing_title": "Crea y Comparte Snippets de Código con Estilo",
     "landing_desc": "CodeEmbed te permite crear, personalizar y compartir tus fragmentos de código de una manera visualmente atractiva y sencilla.",
     "landing_cta_button": "Empezar ahora",
-    "powered_by": "Desarrollado por"
+    "powered_by": "Desarrollado por",
+    "private_snippet_warning": "Este snippet es privado. Para poder compartirlo o incrustarlo, primero debes cambiar su visibilidad a 'Público' en la configuración.",
+    "show_title_label": "Mostrar Título",
+    "show_title_desc": "Incluye el título del snippet en la incrustación.",
+    "show_description_label": "Mostrar Descripción",
+    "show_description_desc": "Incluye la descripción del snippet en la incrustación."
 }

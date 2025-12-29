@@ -5,7 +5,7 @@ import type { Snippet } from '@/lib/definitions';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import { useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { CodePreview } from '@/components/code-preview';
 import { useEffect } from 'react';
 import { Logo } from '@/components/icons';
@@ -135,12 +135,12 @@ export default function EmbedPage({ params }: Props) {
           />
         </CardContent>
         
-        <div className="bg-muted/50 px-4 py-2 flex items-center">
+        <CardFooter className="bg-muted/50 px-4 py-2">
             <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
                 <span>{t('powered_by')}</span>
                 <Logo width={100} height={25} />
             </Link>
-        </div>
+        </CardFooter>
       </Card>
     </div>
   );

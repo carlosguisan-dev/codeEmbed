@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardFooter,
 } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
 import { useDoc, useFirebase, useMemoFirebase } from '@/firebase';
@@ -105,7 +104,7 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
             </CardHeader>
         )}
         
-        <CardContent id="embed-code-content" className={isCompact ? 'p-0' : ''}>
+        <CardContent id="embed-code-content" className={isCompact ? 'p-0' : 'pt-6'}>
           <CodePreview
             code={displaySnippet.code}
             language={displaySnippet.language}
@@ -115,12 +114,12 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
           />
         </CardContent>
         
-        <CardFooter className="bg-muted/50 p-2">
+        <div className="bg-muted/50 p-2 flex items-center">
             <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
                 <span>{t('powered_by')}</span>
                 <Logo width={100} height={25} />
             </Link>
-        </CardFooter>
+        </div>
       </Card>
     </div>
   );

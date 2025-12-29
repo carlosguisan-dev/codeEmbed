@@ -12,6 +12,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInset,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 import { AppHeader } from '@/components/app-header';
 import { Logo } from '@/components/icons';
@@ -24,6 +25,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, isUserLoading } = useFirebase();
   const { t } = useTranslation();
+  const currentYear = new Date().getFullYear();
 
   const isPublicPage = pathname === '/';
   const isLoginPage = pathname === '/login';
@@ -100,6 +102,11 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
+        <SidebarFooter>
+            <div className="text-xs text-muted-foreground text-center p-4 group-data-[collapsible=icon]:hidden">
+                © {currentYear} CodeEmbed
+            </div>
+        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <AppHeader />

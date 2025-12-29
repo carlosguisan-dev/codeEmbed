@@ -64,8 +64,8 @@ export function CodePreview({
   return (
     <div
       className={cn(
-        'relative group rounded-lg border text-sm overflow-hidden font-code',
-        isEmbed ? '!rounded-none !border-0' : '',
+        'relative group text-sm font-code h-full',
+        isEmbed ? '' : 'rounded-lg border',
         themeClasses,
         className
       )}
@@ -93,7 +93,7 @@ export function CodePreview({
         </Button>
       </div>
       
-      <pre className="p-4 overflow-auto">
+      <pre className="p-4 overflow-auto h-full">
         <code className="font-code text-sm whitespace-pre">
           {showLineNumbers ? (
             <div className="flex">

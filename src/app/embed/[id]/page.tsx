@@ -1,3 +1,4 @@
+
 'use client';
 
 import { notFound, useSearchParams } from 'next/navigation';
@@ -11,7 +12,6 @@ import { useEffect } from 'react';
 import { Logo } from '@/components/icons';
 import { useTranslation } from '@/hooks/use-translation';
 import Link from 'next/link';
-import { FileText } from 'lucide-react';
 
 type Props = {
   params: { id: string };
@@ -37,24 +37,26 @@ export default function EmbedPage({ params }: Props) {
     // This effect handles incrementing the view count once per session.
     if (snippet && firestore) {
       const sessionStorageKey = `viewed-snippet-${params.id}`;
-      const hasViewed = sessionStorage.getItem(sessionStorageKey);
+      // Use client-side sessionStorage
+      if (typeof window !== 'undefined') {
+        const hasViewed = sessionStorage.getItem(sessionStorageKey);
 
-      // Only increment if the user hasn't viewed this snippet in this session.
-      if (!hasViewed) {
-        const docRef = doc(firestore, 'snippets', params.id);
-        
-        updateDoc(docRef, {
-          viewCount: increment(1),
-        })
-        .then(() => {
-          // Once the view is successfully recorded, mark it in session storage.
-          sessionStorage.setItem(sessionStorageKey, 'true');
-        })
-        .catch(err => {
-          // Silently fail on view count increment error.
-          // It's not critical for the user experience on the embed page.
-          console.error("Failed to increment view count:", err);
-        });
+        // Only increment if the user hasn't viewed this snippet in this session.
+        if (!hasViewed) {
+          const docRef = doc(firestore, 'snippets', params.id);
+          
+          updateDoc(docRef, {
+            viewCount: increment(1),
+          })
+          .then(() => {
+            // Once the view is successfully recorded, mark it in session storage.
+            sessionStorage.setItem(sessionStorageKey, 'true');
+          })
+          .catch(err => {
+            // Silently fail on view count increment error.
+            console.error("Failed to increment view count:", err);
+          });
+        }
       }
     }
   }, [snippet, firestore, params.id]);
@@ -63,7 +65,7 @@ export default function EmbedPage({ params }: Props) {
   if (isLoading) {
     return (
         <div className="p-4 sm:p-6 md:p-8">
-            <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl">
+            <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl rounded-lg">
                 <CardHeader>
                     <Skeleton className="h-12 w-3/4" />
                     <Skeleton className="h-6 w-1/2" />
@@ -88,7 +90,6 @@ export default function EmbedPage({ params }: Props) {
   
   // A public snippet is required for embedding
   if (snippet && !snippet.isPublic) {
-      // You can render a specific message for private snippets
       return (
           <div className="flex items-center justify-center h-full p-4">
               <Card className="w-full max-w-lg text-center">
@@ -108,24 +109,17 @@ export default function EmbedPage({ params }: Props) {
   }
 
   const embedUrl = `/embed/${snippet.id}`;
-  const isCompact = !showTitle && !showDescription;
 
   return (
-    <div id="embed-root" className="min-h-0">
-      <Card className="w-full max-w-4xl mx-auto border-0 shadow-none overflow-hidden rounded-none">
-        {(showTitle || showDescription) && (
+    <Card id="embed-root" className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl overflow-hidden text-left rounded-lg flex flex-col">
+        {(showTitle || (showDescription && snippet.description)) && (
             <CardHeader id="embed-header">
-              <div className="flex items-start gap-4">
-                {(showTitle || showDescription) && <FileText className="w-8 h-8 text-primary mt-1 flex-shrink-0" />}
-                <div className="flex-grow">
-                  {showTitle && <CardTitle className="font-headline text-2xl">{snippet.title}</CardTitle>}
-                  {showDescription && snippet.description && <CardDescription className="mt-1">{snippet.description}</CardDescription>}
-                </div>
-              </div>
+                {showTitle && <CardTitle className="font-headline text-2xl">{snippet.title}</CardTitle>}
+                {showDescription && snippet.description && <CardDescription className="mt-1">{snippet.description}</CardDescription>}
             </CardHeader>
         )}
         
-        <CardContent id="embed-code-content" className={isCompact ? 'p-0' : ''}>
+        <CardContent id="embed-code-content" className="p-0 flex-grow">
           <CodePreview
             code={snippet.code}
             language={snippet.language}
@@ -135,13 +129,12 @@ export default function EmbedPage({ params }: Props) {
           />
         </CardContent>
         
-        <CardFooter className="bg-muted/50 px-4 py-2">
+        <CardFooter className="bg-muted/50 px-4 py-2 mt-auto">
             <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
                 <span>{t('powered_by')}</span>
                 <Logo width={100} height={25} />
             </Link>
         </CardFooter>
-      </Card>
-    </div>
+    </Card>
   );
 }

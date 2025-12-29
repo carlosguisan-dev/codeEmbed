@@ -8,9 +8,9 @@ import type { Snippet } from '@/lib/definitions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
-import { useTranslation } from '@/hooks/use-translation';
+import { TranslationProvider, useTranslation } from '@/hooks/use-translation';
 
-export default function DebugEmbedsPage() {
+function DebugEmbedsPageContent() {
   const { firestore, user } = useFirebase();
   const [selectedSnippetId, setSelectedSnippetId] = useState<string | null>(null);
   const { t } = useTranslation();
@@ -88,4 +88,13 @@ export default function DebugEmbedsPage() {
       )}
     </div>
   );
+}
+
+
+export default function DebugEmbedsPage() {
+    return (
+        <TranslationProvider>
+            <DebugEmbedsPageContent />
+        </TranslationProvider>
+    )
 }

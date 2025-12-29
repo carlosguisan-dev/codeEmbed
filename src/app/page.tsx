@@ -1,3 +1,4 @@
+
 'use client';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -54,19 +55,16 @@ helloWorld();
               </div>
 
                <div className="w-full max-w-3xl pt-8">
-                  <Card className="w-full border-2 border-primary/20 shadow-xl overflow-hidden text-left">
-                    <CardHeader>
-                        <CardTitle className="font-headline text-2xl">Ejemplo de Snippet</CardTitle>
-                    </CardHeader>
+                  <Card className="w-full border-2 border-primary/20 shadow-xl overflow-hidden text-left rounded-lg">
                     <CodePreview
                       code={codeExample}
                       language="javascript"
                       theme="dark"
                       showLineNumbers={true}
                       isEmbed={true}
-                      className="rounded-t-none"
                     />
-                    <CardFooter className="bg-muted/50 px-4 py-2">
+                    <CardFooter className="bg-muted/50 px-4 py-3 flex items-center justify-between">
+                       <span className="text-sm font-semibold truncate pr-4">Ejemplo de Snippet</span>
                       <Link href="/" className="ml-auto flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
                           <span>{t('powered_by')}</span>
                           <Logo width={100} height={25} />

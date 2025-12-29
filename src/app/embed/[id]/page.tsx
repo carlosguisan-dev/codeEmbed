@@ -50,9 +50,8 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
     };
   }
 
-  // TODO: Localize "Shared from"
-  const title = `${snippet.title} - Shared from CodeEmbed`;
-  const description = snippet.description || 'Check out this code snippet on CodeEmbed.';
+  const title = `${snippet.title} - Compartido desde CodeEmbed por carlosguisan`;
+  const description = snippet.description || 'Echa un vistazo a este snippet de código en CodeEmbed.';
 
   return {
     title: title,

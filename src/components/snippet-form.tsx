@@ -8,7 +8,6 @@ import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -31,7 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { cn } from '@/lib/utils';
+import { Textarea } from './ui/textarea';
 import { CodePreview } from './code-preview';
 
 
@@ -156,6 +155,10 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
     });
   }
 
+  const handleCodeChange = (newCode: string) => {
+    setFormData(prev => ({ ...prev, code: newCode }));
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({...prev, [id]: value}));
@@ -226,29 +229,20 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
                 <CardTitle className="font-headline">{t('code_label')}</CardTitle>
                 <CardDescription>{t('editor_desc')}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                <Textarea
-                    id="code"
-                    value={formData.code}
-                    onChange={handleChange}
-                    className={cn(
-                        'font-code min-h-[300px]',
-                        formData.theme === 'dark' && 'bg-gray-900 text-gray-300 border-gray-700'
-                    )}
-                    placeholder="// Your code here"
-                />
-                 <div className="text-xs text-muted-foreground flex justify-end gap-4">
-                    <span>{t('line_counter', { count: lineCount })}</span>
-                    <span>{t('char_counter', { count: charCount })}</span>
-                </div>
-
-                <Label className="font-headline">{t('theme_previews_title')}</Label>
+            <CardContent>
                 <CodePreview
-                    code={formData.code || "// Your code will appear here"}
+                    code={formData.code}
                     language={formData.language}
                     theme={formData.theme as 'light' | 'dark'}
                     showLineNumbers={formData.lineNumbers}
+                    isEditable={true}
+                    onCodeChange={handleCodeChange}
+                    className="min-h-[300px]"
                 />
+                 <div className="text-xs text-muted-foreground flex justify-end gap-4 mt-2">
+                    <span>{t('line_counter', { count: lineCount })}</span>
+                    <span>{t('char_counter', { count: charCount })}</span>
+                </div>
             </CardContent>
         </Card>
         
@@ -300,7 +294,7 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
                     <CardTitle className="font-headline">{t('description_label')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Textarea id="description" value={formData.description} onChange={handleChange} placeholder={t('description_placeholder')} className="min-h-[244px]" />
+                    <Textarea id="description" value={formData.description || ''} onChange={handleChange} placeholder={t('description_placeholder')} className="min-h-[244px]" />
                 </CardContent>
             </Card>
         </div>

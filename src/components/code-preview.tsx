@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Check, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/use-translation';
+import { Textarea } from './ui/textarea';
 
 type CodePreviewProps = {
   code: string;
@@ -13,16 +14,35 @@ type CodePreviewProps = {
   showLineNumbers: boolean;
   isEmbed?: boolean;
   className?: string;
+  isEditable?: boolean;
+  onCodeChange?: (newCode: string) => void;
 };
 
-export function CodePreview({ code, language, theme, showLineNumbers, isEmbed = false, className }: CodePreviewProps) {
+export function CodePreview({ 
+  code, 
+  language, 
+  theme, 
+  showLineNumbers, 
+  isEmbed = false, 
+  className,
+  isEditable = false,
+  onCodeChange 
+}: CodePreviewProps) {
   const [hasCopied, setHasCopied] = useState(false);
   const { t } = useTranslation();
+  const lineNumbersRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
     setHasCopied(true);
     setTimeout(() => setHasCopied(false), 2000);
+  };
+  
+  const handleScroll = () => {
+    if (lineNumbersRef.current && textareaRef.current) {
+      lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
   };
 
   const lines = code.split('\n');
@@ -44,6 +64,7 @@ export function CodePreview({ code, language, theme, showLineNumbers, isEmbed = 
           {language}
         </span>
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           onClick={handleCopy}
@@ -57,18 +78,40 @@ export function CodePreview({ code, language, theme, showLineNumbers, isEmbed = 
           <span className="ml-2">{hasCopied ? t('copied') : t('copy')}</span>
         </Button>
       </div>
-      <pre className={cn('p-4 whitespace-pre-wrap break-words', theme === 'dark' ? 'text-gray-300' : 'text-gray-800')}>
-        <div className="flex">
+      <div className={cn('relative flex', theme === 'dark' ? 'text-gray-300' : 'text-gray-800')}>
           {showLineNumbers && (
-            <div className="text-right pr-4 select-none opacity-50">
+            <div 
+                ref={lineNumbersRef} 
+                className="text-right pr-4 select-none opacity-50 p-4 sticky top-0 overflow-y-hidden"
+                style={{
+                  height: isEditable ? 'auto' : undefined,
+                  maxHeight: isEditable ? textareaRef.current?.clientHeight : undefined,
+                }}
+            >
               {lines.map((_, index) => (
                 <div key={index}>{index + 1}</div>
               ))}
             </div>
           )}
-          <code className="flex-1">{code}</code>
+          {isEditable ? (
+            <Textarea
+              ref={textareaRef}
+              value={code}
+              onChange={(e) => onCodeChange?.(e.target.value)}
+              onScroll={handleScroll}
+              className={cn(
+                'flex-1 resize-none !border-0 !ring-0 !outline-none p-4 whitespace-pre-wrap break-words font-code',
+                theme === 'dark' ? 'bg-gray-900 text-gray-300' : 'bg-gray-50 text-gray-800',
+                showLineNumbers ? '' : 'px-4'
+              )}
+              placeholder="// Your code here"
+            />
+          ) : (
+            <pre className={cn('p-4 whitespace-pre-wrap break-words flex-1')}>
+                <code>{code}</code>
+            </pre>
+          )}
         </div>
-      </pre>
     </div>
   );
 }

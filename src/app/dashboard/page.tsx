@@ -8,6 +8,8 @@ import { useTranslation } from '@/hooks/use-translation';
 import Link from 'next/link';
 import { PlusCircle, Loader2 } from 'lucide-react';
 import { SnippetCard } from '@/components/snippet-card';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 function DashboardLoading() {
   return (
@@ -20,6 +22,8 @@ function DashboardLoading() {
 export default function DashboardPage() {
   const { t } = useTranslation();
   const { isUserLoading, firestore, user } = useFirebase();
+  const router = useRouter();
+  const [isNavigating, setIsNavigating] = useState(false);
 
   // Query for snippets created by the current user.
   const snippetsQuery = useMemoFirebase(() => {
@@ -31,9 +35,15 @@ export default function DashboardPage() {
 
   const { data: snippets, isLoading: areSnippetsLoading } =
     useCollection<Snippet>(snippetsQuery);
+    
+  const handleSnippetClick = (snippetId: string) => {
+    setIsNavigating(true);
+    router.push(`/snippets/${snippetId}/edit`);
+  };
+
 
   // Show a loading state while auth or data fetching is in progress.
-  if (isUserLoading || areSnippetsLoading) {
+  if (isUserLoading || areSnippetsLoading || isNavigating) {
     return <DashboardLoading />;
   }
 
@@ -52,9 +62,9 @@ export default function DashboardPage() {
       {snippets && snippets.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {snippets.map(snippet => (
-            <Link key={snippet.id} href={`/snippets/${snippet.id}/edit`}>
+            <div key={snippet.id} onClick={() => handleSnippetClick(snippet.id)} className="cursor-pointer">
                 <SnippetCard snippet={snippet} />
-            </Link>
+            </div>
           ))}
         </div>
       ) : (

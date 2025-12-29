@@ -33,8 +33,8 @@ helloWorld();
         </nav>
       </header>
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32">
-          <div className="container px-4 md:px-6">
+        <section className="w-full py-12 md:py-24 lg:py-32 flex justify-center">
+          <div className="container px-4 md:px-6 flex flex-col items-center">
             <div className="flex flex-col items-center space-y-8 text-center">
               <div className="space-y-4">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline">
@@ -63,7 +63,7 @@ helloWorld();
                       isEmbed={true}
                     />
                     <CardFooter className="bg-muted/50 px-4 py-2">
-                      <Link href="/" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
+                      <Link href="/" className="ml-auto flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
                           <span>{t('powered_by')}</span>
                           <Logo width={100} height={25} />
                       </Link>

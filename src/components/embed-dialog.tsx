@@ -13,10 +13,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Check, Copy, Lock } from 'lucide-react';
+import { Check, Copy, Lock, Info } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import type { Snippet } from '@/lib/definitions';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from './ui/textarea';
@@ -43,7 +43,8 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   });
 
   const embedUrl = `${baseUrl}/embed/${snippet.id}?${queryParams.toString()}`;
-  const iframeCode = `<iframe src="${embedUrl}" style="width:100%;border:0;border-radius:4px;overflow:hidden;" title="${snippet.title}" allow="clipboard-write" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy"></iframe>`;
+  const iframeCode = `<iframe src="${embedUrl}" id="code-embed-${snippet.id}" style="width:100%;border:0;border-radius:4px;overflow:hidden;" title="${snippet.title}" allow="clipboard-write" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>`;
+  const resizerScriptCode = `<script src="${baseUrl}/embed-resizer.js" async></script>`;
 
   useEffect(() => {
     // When a new snippet is passed, reset the toggles to their default state
@@ -59,8 +60,8 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   };
 
   const options = [
-    { id: 'link', label: t('direct_link'), value: embedUrl, isTextarea: false },
     { id: 'iframe', label: t('iframe_embed'), value: iframeCode, isTextarea: true },
+    { id: 'script_embed', label: t('script_embed'), value: resizerScriptCode, isTextarea: false },
   ];
 
   return (
@@ -102,7 +103,7 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
                                 id={option.id}
                                 value={option.value}
                                 readOnly
-                                className="font-code text-sm min-h-[120px]"
+                                className="font-code text-sm min-h-[100px] resize-none"
                              />
                         ) : (
                             <Input
@@ -128,6 +129,13 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
                     </div>
                     </div>
                 ))}
+                <Alert>
+                    <Info className="h-4 w-4" />
+                    <AlertTitle>¡Importante!</AlertTitle>
+                    <AlertDescription>
+                        Para que la altura del snippet se ajuste automáticamente, pega el Iframe y el Script en tu HTML.
+                    </AlertDescription>
+                </Alert>
               </div>
             </>
         ) : (

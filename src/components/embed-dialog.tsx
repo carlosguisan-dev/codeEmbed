@@ -29,7 +29,6 @@ interface EmbedDialogProps {
 export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   const { t } = useTranslation();
   const [showTitle, setShowTitle] = useState(true);
-  const [showDescription, setShowDescription] = useState(true);
   const [hasCopiedCode, setHasCopiedCode] = useState(false);
   const [hasCopiedLink, setHasCopiedLink] = useState(false);
 
@@ -40,9 +39,6 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   const queryParams = new URLSearchParams();
   if (!showTitle) {
     queryParams.set('showTitle', 'false');
-  }
-  if (!showDescription) {
-    queryParams.set('showDescription', 'false');
   }
   
   const queryString = queryParams.toString();
@@ -80,13 +76,6 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
                         <p className="text-xs text-muted-foreground">{t('show_title_desc')}</p>
                       </div>
                       <Switch id="show-title" checked={showTitle} onCheckedChange={setShowTitle} />
-                    </div>
-                     <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
-                      <div className="space-y-0.5">
-                        <Label htmlFor="show-description" className="cursor-pointer">{t('show_description_label')}</Label>
-                        <p className="text-xs text-muted-foreground">{t('show_description_desc')}</p>
-                      </div>
-                      <Switch id="show-description" checked={showDescription} onCheckedChange={setShowDescription} />
                     </div>
                 </div>
 
@@ -148,4 +137,3 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
     </Dialog>
   );
 }
-

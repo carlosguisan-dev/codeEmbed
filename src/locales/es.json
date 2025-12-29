@@ -92,7 +92,7 @@
     "show_title_label": "Mostrar Título",
     "show_title_desc": "Incluye el título del snippet en la incrustación.",
     "show_description_label": "Mostrar Descripción",
-    "show_description_desc": "Incluye la descripción del snippet en la incrustación.",
+    "show_description_desc": "Esta opción solo aplica a la vista de enlace directo.",
     "view_one": "1 vista",
     "view_other": "{{count}} vistas",
     "shared_from": "Compartido desde"

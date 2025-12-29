@@ -92,7 +92,7 @@
     "show_title_label": "Show Title",
     "show_title_desc": "Include the snippet's title in the embed.",
     "show_description_label": "Show Description",
-    "show_description_desc": "Include the snippet's description in the embed.",
+    "show_description_desc": "This option only applies to the direct link view.",
     "view_one": "1 view",
     "view_other": "{{count}} views",
     "shared_from": "Shared from"

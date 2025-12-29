@@ -7,8 +7,6 @@ import { Check, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/use-translation';
 import { Textarea } from './ui/textarea';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { a11yDark, a11yLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 type CodePreviewProps = {
   code: string;
@@ -40,6 +38,10 @@ export function CodePreview({
     setTimeout(() => setHasCopied(false), 2000);
   };
   
+  const themeClasses = theme === 'dark' 
+    ? 'bg-[#282c34] text-gray-300' 
+    : 'bg-gray-50 text-gray-800';
+
   if (isEditable) {
     return (
       <div className={cn('relative group rounded-lg border text-sm overflow-hidden font-code', className)}>
@@ -48,27 +50,28 @@ export function CodePreview({
           onChange={(e) => onCodeChange?.(e.target.value)}
           className={cn(
             'flex-1 resize-none !border-0 !ring-0 !outline-none p-4 whitespace-pre-wrap break-words font-code min-h-[300px]',
-            theme === 'dark' ? 'bg-gray-900 text-gray-300' : 'bg-gray-50 text-gray-800'
+            themeClasses
           )}
           placeholder="// Your code here"
         />
       </div>
     );
   }
-  
-  const selectedTheme = theme === 'dark' ? a11yDark : a11yLight;
+
+  const lines = code.split('\n');
 
   return (
     <div
       className={cn(
         'relative group rounded-lg border text-sm overflow-hidden font-code',
         isEmbed ? '!rounded-none !border-0' : '',
+        themeClasses,
         className
       )}
     >
       <div className={cn(
         'flex items-center justify-between px-4 py-2 border-b',
-        theme === 'dark' ? 'bg-[#282c34] border-gray-700' : 'bg-gray-100 border-gray-200'
+        theme === 'dark' ? 'bg-black/20 border-gray-700' : 'bg-black/5 border-gray-200'
       )}>
         <span className={cn('text-xs font-semibold', theme === 'dark' ? 'text-gray-400' : 'text-gray-600')}>
           {language}
@@ -89,25 +92,20 @@ export function CodePreview({
         </Button>
       </div>
       
-      <SyntaxHighlighter
-        language={language}
-        style={selectedTheme}
-        showLineNumbers={showLineNumbers}
-        wrapLines={true}
-        wrapLongLines={true}
-        className="!p-4 !m-0 !rounded-none"
-        customStyle={{
-          backgroundColor: theme === 'dark' ? '#282c34' : '#f9fafb',
-          margin: 0,
-        }}
-        codeTagProps={{
-            style: {
-                fontFamily: 'inherit'
-            }
-        }}
-      >
-        {code}
-      </SyntaxHighlighter>
+      <div className="flex text-sm">
+        {showLineNumbers && (
+          <div className="text-right pr-4 select-none opacity-50 p-4">
+            {lines.map((_, index) => (
+              <div key={index}>{index + 1}</div>
+            ))}
+          </div>
+        )}
+        <pre className="p-4 !m-0 !font-code w-full overflow-auto">
+          <code>
+            {code}
+          </code>
+        </pre>
+      </div>
     </div>
   );
 }

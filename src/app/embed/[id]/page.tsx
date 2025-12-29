@@ -22,6 +22,7 @@ export default function EmbedPage({ params }: Props) {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
 
+  // Correctly read search params. Default to true if param is not 'false'.
   const showTitle = searchParams.get('showTitle') !== 'false';
   const showDescription = searchParams.get('showDescription') !== 'false';
 
@@ -80,8 +81,30 @@ export default function EmbedPage({ params }: Props) {
     throw error;
   }
 
-  if (!snippet) {
+  // A snippet is not found if data is null after loading and there's no error.
+  if (!isLoading && !snippet) {
     notFound();
+  }
+  
+  // A public snippet is required for embedding
+  if (snippet && !snippet.isPublic) {
+      // You can render a specific message for private snippets
+      return (
+          <div className="flex items-center justify-center h-full p-4">
+              <Card className="w-full max-w-lg text-center">
+                  <CardHeader>
+                      <CardTitle>Snippet Privado</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                      <p>Este snippet es privado y no puede ser incrustado.</p>
+                  </CardContent>
+              </Card>
+          </div>
+      );
+  }
+
+  if (!snippet) {
+      return null; // Should be covered by isLoading or notFound, but as a fallback.
   }
 
   const embedUrl = `/embed/${snippet.id}`;

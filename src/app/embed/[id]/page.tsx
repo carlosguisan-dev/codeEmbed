@@ -1,176 +1,83 @@
-'use client';
-import { notFound, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { CodePreview } from '@/components/code-preview';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
-import { FileText } from 'lucide-react';
-import { useDoc, useFirebase, useMemoFirebase } from '@/firebase';
-import { doc, updateDoc, increment } from 'firebase/firestore';
+
+import { notFound } from 'next/navigation';
 import type { Snippet } from '@/lib/definitions';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect } from 'react';
-import { Logo } from '@/components/icons';
-import { useTranslation } from '@/hooks/use-translation';
+import { Metadata, ResolvingMetadata } from 'next';
+import { getFirebaseAdmin } from '@/lib/firebase-admin';
+import EmbedPageContent from './embed-page-content';
 
+type Props = {
+  params: { id: string };
+};
 
-function EmbedPageContent({ snippet: initialSnippet, id }: { snippet: Snippet, id: string }) {
-  const { firestore } = useFirebase();
-  const { t } = useTranslation();
-  const searchParams = useSearchParams();
+// This function fetches data on the server
+async function getSnippet(id: string): Promise<Snippet | null> {
+    try {
+        const { db } = getFirebaseAdmin();
+        const snippetDoc = await db.collection('snippets').doc(id).get();
 
-  const showTitle = searchParams.get('showTitle') !== 'false';
-  const showDescription = searchParams.get('showDescription') !== 'false';
+        if (!snippetDoc.exists) {
+            return null;
+        }
 
-  const snippetRef = useMemoFirebase(
-    () => (firestore ? doc(firestore, 'snippets', id) : null),
-    [firestore, id]
-  );
-  // We use the initial snippet from the server, but useDoc will keep it up-to-date in real-time if needed.
-  const { data: snippet, isLoading } = useDoc<Snippet>(snippetRef);
+        const snippetData = snippetDoc.data() as Omit<Snippet, 'id'>;
 
-  const displaySnippet = snippet || initialSnippet;
-
-
-  useEffect(() => {
-    // This effect handles incrementing the view count once per session.
-    if (displaySnippet && firestore) {
-      const sessionStorageKey = `viewed-snippet-${id}`;
-      const hasViewed = sessionStorage.getItem(sessionStorageKey);
-
-      // Only increment if the user hasn't viewed this snippet in this session.
-      if (!hasViewed) {
-        const docRef = doc(firestore, 'snippets', id);
+        // Ensure that the snippet is public before returning it
+        if (!snippetData.isPublic) {
+            return null;
+        }
         
-        updateDoc(docRef, {
-          viewCount: increment(1),
-        })
-        .then(() => {
-          // Once the view is successfully recorded, mark it in session storage.
-          sessionStorage.setItem(sessionStorageKey, 'true');
-        })
-        .catch(err => {
-          // Silently fail on view count increment error.
-          // It's not critical for the user experience on the embed page.
-          console.error("Failed to increment view count:", err);
-        });
-      }
+        return {
+            id: snippetDoc.id,
+            ...snippetData,
+            // Firestore Timestamps need to be converted to strings for serialization
+            createdAt: snippetData.createdAt.toString(),
+            updatedAt: snippetData.updatedAt.toString(),
+        };
+    } catch (error) {
+        console.error("Error fetching snippet server-side:", error);
+        return null;
     }
-  }, [displaySnippet, firestore, id]);
-
-
-  if (isLoading && !displaySnippet) {
-    return (
-        <div className="p-4 sm:p-6 md:p-8">
-            <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl">
-                <CardHeader>
-                    <Skeleton className="h-12 w-3/4" />
-                    <Skeleton className="h-6 w-1/2" />
-                </CardHeader>
-                <CardContent>
-                    <Skeleton className="h-64 w-full" />
-                </CardContent>
-            </Card>
-        </div>
-    )
-  }
-
-  if (!displaySnippet) {
-    notFound();
-  }
-  
-  const embedUrl = `/embed/${displaySnippet.id}`;
-  const isCompact = !showTitle && !showDescription;
-
-  if (isCompact) {
-    return (
-      <div className="flex flex-col h-screen">
-          <CodePreview
-            code={displaySnippet.code}
-            language={displaySnippet.language}
-            theme={displaySnippet.theme}
-            showLineNumbers={displaySnippet.lineNumbers}
-            isEmbed={true}
-            className="flex-grow rounded-none border-none"
-          />
-        <CardFooter className="bg-muted/50 px-4 py-2 mt-auto">
-            <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
-                <span>{t('powered_by')}</span>
-                <Logo width={100} height={25} />
-            </Link>
-        </CardFooter>
-      </div>
-    );
-  }
-
-  return (
-    <div className="p-4 sm:p-6 md:p-8">
-      <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl overflow-hidden">
-        {(showTitle || showDescription) && (
-            <CardHeader>
-            <div className="flex items-start gap-4">
-                {(showTitle || showDescription) && <FileText className="w-8 h-8 text-primary mt-1" />}
-                <div>
-                {showTitle && <CardTitle className="font-headline text-2xl">{displaySnippet.title}</CardTitle>}
-                {showDescription && <CardDescription>{displaySnippet.description}</CardDescription>}
-                </div>
-            </div>
-            </CardHeader>
-        )}
-        <CardContent>
-          <CodePreview
-            code={displaySnippet.code}
-            language={displaySnippet.language}
-            theme={displaySnippet.theme}
-            showLineNumbers={displaySnippet.lineNumbers}
-            isEmbed={true}
-          />
-        </CardContent>
-        <CardFooter className="bg-muted/50 px-4 py-2">
-            <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
-                <span>{t('powered_by')}</span>
-                <Logo width={100} height={25} />
-            </Link>
-        </CardFooter>
-      </Card>
-    </div>
-  );
 }
 
 
-export default function EmbedPage({ params }: { params: { id: string } }) {
-  const { firestore } = useFirebase();
-  const snippetRef = useMemoFirebase(
-    () => (firestore ? doc(firestore, 'snippets', params.id) : null),
-    [firestore, params.id]
-  );
-  const { data: snippet, isLoading } = useDoc<Snippet>(snippetRef);
+// This function generates the metadata on the server
+export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  const snippet = await getSnippet(params.id);
 
-  if (isLoading) {
-     return (
-        <div className="p-4 sm:p-6 md:p-8">
-            <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl">
-                <CardHeader>
-                    <Skeleton className="h-12 w-3/4" />
-                    <Skeleton className="h-6 w-1/2" />
-                </CardHeader>
-                <CardContent>
-                    <Skeleton className="h-64 w-full" />
-                </CardContent>
-            </Card>
-        </div>
-    )
+  if (!snippet) {
+    return {
+      title: 'Snippet Not Found',
+    };
   }
+
+  // TODO: Localize "Shared from"
+  const title = `${snippet.title} - Shared from CodeEmbed`;
+  const description = snippet.description || 'Check out this code snippet on CodeEmbed.';
+
+  return {
+    title: title,
+    description: description,
+    openGraph: {
+      title: title,
+      description: description,
+      // You can add a specific image for each snippet if you have one
+    },
+    twitter: {
+        title: title,
+        description: description,
+    }
+  };
+}
+
+
+// This is the main page component (Server Component)
+export default async function EmbedPage({ params }: Props) {
+  const snippet = await getSnippet(params.id);
 
   if (!snippet) {
     notFound();
   }
 
-  return <EmbedPageContent snippet={snippet} id={params.id} />
+  // We pass the server-fetched snippet to the client component
+  return <EmbedPageContent snippet={snippet} id={params.id} />;
 }

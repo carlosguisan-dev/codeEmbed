@@ -30,7 +30,8 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const isPublicPage = pathname === '/';
   const isLoginPage = pathname === '/login';
   const isEmbedPage = pathname.startsWith('/embed');
-  const isAppPage = !isPublicPage && !isLoginPage && !isEmbedPage;
+  const isSharedSnippetPage = pathname.startsWith('/s/');
+  const isAppPage = !isPublicPage && !isLoginPage && !isEmbedPage && !isSharedSnippetPage;
 
   useEffect(() => {
     if (isUserLoading) return; // Wait until loading is finished
@@ -47,7 +48,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   }, [user, isUserLoading, isAppPage, isLoginPage, router]);
 
 
-  if (isPublicPage || isEmbedPage) {
+  if (isPublicPage || isEmbedPage || isSharedSnippetPage) {
     return <>{children}</>;
   }
 

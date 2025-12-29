@@ -1,7 +1,7 @@
 'use client';
 
 import type { Snippet } from '@/lib/definitions';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { CodePreview } from '@/components/code-preview';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

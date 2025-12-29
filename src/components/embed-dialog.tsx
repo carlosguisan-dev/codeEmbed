@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState }from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Lock, Info } from 'lucide-react';
+import { Lock, Info, Copy, Check } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import type { Snippet } from '@/lib/definitions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -30,6 +30,8 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   const { t } = useTranslation();
   const [showTitle, setShowTitle] = useState(true);
   const [showDescription, setShowDescription] = useState(true);
+  const [hasCopiedCode, setHasCopiedCode] = useState(false);
+  const [hasCopiedLink, setHasCopiedLink] = useState(false);
 
   if (!snippet) return null;
 
@@ -48,6 +50,18 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   
   const iframeCode = `<iframe src="${embedUrl}" style="width:100%;border:0;" loading="lazy" allowfullscreen></iframe>`;
 
+  const handleCopy = (textToCopy: string, type: 'code' | 'link') => {
+    navigator.clipboard.writeText(textToCopy);
+    if (type === 'code') {
+      setHasCopiedCode(true);
+      setTimeout(() => setHasCopiedCode(false), 2000);
+    } else {
+      setHasCopiedLink(true);
+      setTimeout(() => setHasCopiedLink(false), 2000);
+    }
+  };
+
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[625px]">
@@ -62,14 +76,14 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
                     <Label>{t('embed_options')}</Label>
                     <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
                       <div className="space-y-0.5">
-                        <Label htmlFor="show-title">{t('show_title_label')}</Label>
+                        <Label htmlFor="show-title" className="cursor-pointer">{t('show_title_label')}</Label>
                         <p className="text-xs text-muted-foreground">{t('show_title_desc')}</p>
                       </div>
                       <Switch id="show-title" checked={showTitle} onCheckedChange={setShowTitle} />
                     </div>
                      <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm">
                       <div className="space-y-0.5">
-                        <Label htmlFor="show-description">{t('show_description_label')}</Label>
+                        <Label htmlFor="show-description" className="cursor-pointer">{t('show_description_label')}</Label>
                         <p className="text-xs text-muted-foreground">{t('show_description_desc')}</p>
                       </div>
                       <Switch id="show-description" checked={showDescription} onCheckedChange={setShowDescription} />
@@ -78,17 +92,36 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
 
                 <div className="grid w-full items-center gap-1.5">
                     <Label htmlFor="iframe-code">{t('iframe_embed')}</Label>
-                     <Textarea
-                        id="iframe-code"
-                        value={iframeCode}
-                        readOnly
-                        className="font-code text-sm min-h-[100px] resize-none"
-                     />
+                    <div className="relative">
+                        <Textarea
+                            id="iframe-code"
+                            value={iframeCode}
+                            readOnly
+                            className="font-code text-sm min-h-[100px] resize-none pr-12"
+                        />
+                        <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            className="absolute top-2 right-2 h-7 w-7 text-muted-foreground hover:bg-muted"
+                            onClick={() => handleCopy(iframeCode, 'code')}
+                        >
+                            {hasCopiedCode ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
+                        </Button>
+                    </div>
                 </div>
                 <div className="grid w-full items-center gap-1.5">
                     <Label htmlFor="direct-link">{t('direct_link')}</Label>
                     <div className="flex items-center space-x-2">
                         <Input id="direct-link" value={embedUrl} readOnly />
+                        <Button
+                            type="button"
+                            size="icon"
+                            variant="outline"
+                            onClick={() => handleCopy(embedUrl, 'link')}
+                        >
+                            {hasCopiedLink ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
+                        </Button>
                     </div>
                 </div>
                  <Alert>
@@ -115,3 +148,4 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
     </Dialog>
   );
 }
+

@@ -104,7 +104,7 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
             </CardHeader>
         )}
         
-        <CardContent id="embed-code-content" className={isCompact ? 'p-0' : 'pt-6'}>
+        <CardContent id="embed-code-content" className={isCompact ? 'p-0' : ''}>
           <CodePreview
             code={displaySnippet.code}
             language={displaySnippet.language}

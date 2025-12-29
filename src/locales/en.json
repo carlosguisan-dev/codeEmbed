@@ -95,5 +95,8 @@
     "show_description_desc": "Include the snippet's description in the embed.",
     "view_one": "1 view",
     "view_other": "{{count}} views",
-    "shared_from": "Shared from"
+    "shared_from": "Shared from",
+    "debug_embeds_title": "Debug Embeds",
+    "debug_embeds_desc": "Select a snippet to see a live preview of its web component version.",
+    "select_snippet_placeholder": "Select a snippet to debug"
 }

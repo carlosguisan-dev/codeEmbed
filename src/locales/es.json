@@ -95,5 +95,8 @@
     "show_description_desc": "Incluye la descripción del snippet en la incrustación.",
     "view_one": "1 vista",
     "view_other": "{{count}} vistas",
-    "shared_from": "Compartido desde"
+    "shared_from": "Compartido desde",
+    "debug_embeds_title": "Depurar Embeds",
+    "debug_embeds_desc": "Selecciona un snippet para ver una vista previa en vivo de su versión como componente web.",
+    "select_snippet_placeholder": "Selecciona un snippet para depurar"
 }

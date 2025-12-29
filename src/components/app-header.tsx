@@ -13,6 +13,7 @@ export function AppHeader() {
     if (pathname.includes('/snippets/new')) return t('new_snippet_title');
     if (pathname.includes('/edit')) return t('edit_snippet_title');
     if (pathname.includes('/profile')) return t('profile_settings_title');
+    if (pathname.includes('/debug-embeds')) return t('debug_embeds_title');
     return 'CodeEmbed';
   };
 

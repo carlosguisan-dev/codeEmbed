@@ -1,4 +1,7 @@
 
+@import 'react-syntax-highlighter/dist/esm/styles/prism/a11y-dark.css';
+@import 'react-syntax-highlighter/dist/esm/styles/prism/a11y-light.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

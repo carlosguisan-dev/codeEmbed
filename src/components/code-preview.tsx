@@ -7,6 +7,8 @@ import { Check, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/use-translation';
 import { Textarea } from './ui/textarea';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { a11yDark, a11yLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 type CodePreviewProps = {
   code: string;
@@ -39,8 +41,8 @@ export function CodePreview({
   };
   
   const themeClasses = theme === 'dark' 
-    ? 'bg-[#282c34] text-gray-300' 
-    : 'bg-gray-50 text-gray-800';
+    ? 'dark-theme bg-[#282c34] text-gray-300' 
+    : 'light-theme bg-gray-50 text-gray-800';
 
   if (isEditable) {
     return (
@@ -58,7 +60,7 @@ export function CodePreview({
     );
   }
 
-  const lines = code.split('\n');
+  const syntaxTheme = theme === 'dark' ? a11yDark : a11yLight;
 
   return (
     <div
@@ -92,20 +94,25 @@ export function CodePreview({
         </Button>
       </div>
       
-      <div className="flex text-sm">
-        {showLineNumbers && (
-          <div className="text-right pr-4 select-none opacity-50 p-4">
-            {lines.map((_, index) => (
-              <div key={index}>{index + 1}</div>
-            ))}
-          </div>
-        )}
-        <pre className="p-4 !m-0 !font-code w-full overflow-auto">
-          <code>
-            {code}
-          </code>
-        </pre>
-      </div>
+        <SyntaxHighlighter
+            language={language}
+            style={syntaxTheme}
+            showLineNumbers={showLineNumbers}
+            lineNumberStyle={{ minWidth: '2.25em', opacity: 0.5, userSelect: 'none' }}
+            customStyle={{
+                margin: 0,
+                padding: '1rem',
+                backgroundColor: 'transparent',
+                width: '100%',
+                overflow: 'auto',
+            }}
+            codeTagProps={{
+                className: 'font-code text-sm'
+            }}
+            useInlineStyles={false}
+        >
+          {code}
+        </SyntaxHighlighter>
     </div>
   );
 }

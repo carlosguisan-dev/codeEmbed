@@ -1,26 +1,8 @@
-'use client';
+import type { Metadata } from 'next';
 import './globals.css';
 import { Work_Sans, Fira_Code } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
-import { TranslationProvider, useTranslation } from '@/hooks/use-translation';
-import React from 'react';
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarInset,
-} from '@/components/ui/sidebar';
-import { AppHeader } from '@/components/app-header';
-import Link from 'next/link';
-import { LayoutDashboard, Loader2, Code } from 'lucide-react';
-import { Logo } from '@/components/icons';
-import { FirebaseClientProvider, useFirebase } from '@/firebase';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { AppProvider } from '@/components/app-provider';
 import { cn } from '@/lib/utils';
 
 
@@ -36,96 +18,31 @@ const firaCode = Fira_Code({
   display: 'swap',
 });
 
-
-function AppLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const { user, isUserLoading } = useFirebase();
-  const { t } = useTranslation();
-
-  const isPublicPage = pathname === '/';
-  const isLoginPage = pathname === '/login';
-  const isEmbedPage = pathname.startsWith('/embed');
-  const isAppPage = !isPublicPage && !isLoginPage && !isEmbedPage;
-
-  useEffect(() => {
-    if (isUserLoading) return; // Wait until loading is finished
-
-    // If user is not logged in and tries to access an app page, redirect to login
-    if (!user && isAppPage) {
-      router.push('/login');
-    }
-
-    // If user is logged in and tries to access login page, redirect to dashboard
-    if (user && isLoginPage) {
-      router.push('/dashboard');
-    }
-  }, [user, isUserLoading, isAppPage, isLoginPage, router]);
-
-
-  if (isPublicPage || isEmbedPage) {
-    return <>{children}</>;
-  }
-
-  if (isLoginPage) {
-    return <>{children}</>;
-  }
-  
-  if (isUserLoading && isAppPage) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!user && isAppPage) {
-    // This will be briefly visible before the useEffect redirect kicks in
-    // Or if the redirect fails for some reason.
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <p>Redirecting to login...</p>
-      </div>
-    );
-  }
-
-  // Render the full app layout for authenticated users
-  return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-2 p-2">
-            <Logo width={150} height={40} />
-          </div>
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={t('dashboard_title')}>
-                <Link href="/dashboard">
-                  <LayoutDashboard />
-                  <span>{t('dashboard_title')}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={t('new_snippet_title')}>
-                    <Link href="/snippets/new">
-                        <Code/>
-                        <span>{t('new_snippet_title')}</span>
-                    </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarContent>
-      </Sidebar>
-      <SidebarInset>
-        <AppHeader />
-        <main className="p-4 sm:p-6 lg:p-8">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
-  );
-}
+export const metadata: Metadata = {
+  title: 'CodeEmbed - Crea y Comparte Snippets de Código con Estilo',
+  description: 'CodeEmbed te permite crear, personalizar y compartir tus fragmentos de código de una manera visualmente atractiva y sencilla.',
+  openGraph: {
+    title: 'CodeEmbed - Crea y Comparte Snippets de Código con Estilo',
+    description: 'CodeEmbed te permite crear, personalizar y compartir tus fragmentos de código de una manera visualmente atractiva y sencilla.',
+    url: 'https://codeembed.dev', // Replace with your actual domain
+    siteName: 'CodeEmbed',
+    images: [
+      {
+        url: 'https://picsum.photos/seed/codeembed-social/1200/630', // Replace with a branded image
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'es_ES',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CodeEmbed - Crea y Comparte Snippets de Código con Estilo',
+    description: 'CodeEmbed te permite crear, personalizar y compartir tus fragmentos de código de una manera visualmente atractiva y sencilla.',
+    images: ['https://picsum.photos/seed/codeembed-social/1200/630'], // Replace with a branded image
+  },
+};
 
 
 export default function RootLayout({
@@ -139,14 +56,10 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.png" type="image/png" />
       </head>
       <body className={cn("font-body antialiased", workSans.variable, firaCode.variable)}>
-        <FirebaseClientProvider>
-          <TranslationProvider>
-            <AppLayout>
-              {children}
-            </AppLayout>
-            <Toaster />
-          </TranslationProvider>
-        </FirebaseClientProvider>
+          <AppProvider>
+            {children}
+          </AppProvider>
+          <Toaster />
       </body>
     </html>
   );

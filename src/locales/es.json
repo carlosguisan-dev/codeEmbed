@@ -58,7 +58,7 @@
     "embed_snippet_desc": "Copia el código a continuación para incrustar este snippet en tu sitio web.",
     "direct_link": "Enlace Directo",
     "iframe_embed": "Código Iframe",
-    "script_embed": "Script de redimensionamiento (Recomendado)",
+    "embed_options": "Opciones de Incrustación",
     "profile": "Perfil",
     "billing": "Facturación",
     "settings": "Ajustes",
@@ -95,8 +95,5 @@
     "show_description_desc": "Incluye la descripción del snippet en la incrustación.",
     "view_one": "1 vista",
     "view_other": "{{count}} vistas",
-    "shared_from": "Compartido desde",
-    "debug_embeds_title": "Depurar Embeds",
-    "debug_embeds_desc": "Selecciona un snippet para ver una vista previa en vivo de su versión como componente web.",
-    "select_snippet_placeholder": "Selecciona un snippet para depurar"
+    "shared_from": "Compartido desde"
 }

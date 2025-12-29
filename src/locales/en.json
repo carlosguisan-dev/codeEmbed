@@ -58,7 +58,7 @@
     "embed_snippet_desc": "Copy the code below to embed this snippet on your website.",
     "direct_link": "Direct Link",
     "iframe_embed": "Iframe Code",
-    "script_embed": "Resizing Script (Recommended)",
+    "embed_options": "Embed Options",
     "profile": "Profile",
     "billing": "Billing",
     "settings": "Settings",
@@ -95,8 +95,5 @@
     "show_description_desc": "Include the snippet's description in the embed.",
     "view_one": "1 view",
     "view_other": "{{count}} views",
-    "shared_from": "Shared from",
-    "debug_embeds_title": "Debug Embeds",
-    "debug_embeds_desc": "Select a snippet to see a live preview of its web component version.",
-    "select_snippet_placeholder": "Select a snippet to debug"
+    "shared_from": "Shared from"
 }

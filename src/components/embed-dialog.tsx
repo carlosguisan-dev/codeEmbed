@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,11 +12,13 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Lock, Info, Code } from 'lucide-react';
+import { Lock, Info, Code, Link as LinkIcon } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
 import type { Snippet } from '@/lib/definitions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Textarea } from './ui/textarea';
+import { Checkbox } from './ui/checkbox';
+import { Input } from './ui/input';
 
 interface EmbedDialogProps {
   snippet: Snippet | null;
@@ -26,13 +28,21 @@ interface EmbedDialogProps {
 
 export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   const { t } = useTranslation();
+  const [showTitle, setShowTitle] = useState(true);
+  const [showDescription, setShowDescription] = useState(true);
 
   if (!snippet) return null;
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
   
-  const webComponentTag = `<code-embed snippet-id="${snippet.id}"></code-embed>`;
-  const scriptTag = `<script src="${baseUrl}/embed.js" async defer></script>`;
+  const queryParams = new URLSearchParams();
+  if (!showTitle) queryParams.set('showTitle', 'false');
+  if (!showDescription) queryParams.set('showDescription', 'false');
+  
+  const embedUrl = `${baseUrl}/embed/${snippet.id}?${queryParams.toString()}`;
+  const directLink = `${baseUrl}/embed/${snippet.id}`;
+
+  const iframeCode = `<iframe src="${embedUrl}" style="width:100%;border:0;" loading="lazy" allowfullscreen></iframe>`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -44,36 +54,38 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
         
         {snippet.isPublic ? (
             <div className="grid gap-6 mt-4">
-                 <Alert>
-                    <Code className="h-4 w-4" />
-                    <AlertTitle>Web Component (Recomendado)</AlertTitle>
-                    <AlertDescription>
-                        Usa esta etiqueta HTML moderna para incrustar el snippet. Se ajusta automáticamente y tiene mejor rendimiento.
-                    </AlertDescription>
-                </Alert>
+                 <div className="space-y-4">
+                    <Label>{t('embed_options')}</Label>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="show-title" checked={showTitle} onCheckedChange={(checked) => setShowTitle(Boolean(checked))} />
+                      <Label htmlFor="show-title" className="font-normal">{t('show_title_label')}</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="show-description" checked={showDescription} onCheckedChange={(checked) => setShowDescription(Boolean(checked))} />
+                      <Label htmlFor="show-description" className="font-normal">{t('show_description_label')}</Label>
+                    </div>
+                </div>
+
                 <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="web-component-code">1. Pega la etiqueta del snippet en tu contenido</Label>
+                    <Label htmlFor="iframe-code">{t('iframe_embed')}</Label>
                      <Textarea
-                        id="web-component-code"
-                        value={webComponentTag}
+                        id="iframe-code"
+                        value={iframeCode}
                         readOnly
-                        className="font-code text-sm min-h-[60px] resize-none"
+                        className="font-code text-sm min-h-[100px] resize-none"
                      />
                 </div>
                 <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="script-code">2. Añade el script (una sola vez por página)</Label>
-                    <Textarea
-                        id="script-code"
-                        value={scriptTag}
-                        readOnly
-                        className="font-code text-sm min-h-[60px] resize-none"
-                    />
+                    <Label htmlFor="direct-link">{t('direct_link')}</Label>
+                    <div className="flex items-center space-x-2">
+                        <Input id="direct-link" value={directLink} readOnly />
+                    </div>
                 </div>
-                <Alert variant="destructive">
+                 <Alert>
                     <Info className="h-4 w-4" />
-                    <AlertTitle>¡Importante!</AlertTitle>
+                    <AlertTitle>¿Cómo funciona?</AlertTitle>
                     <AlertDescription>
-                        El script solo necesita ser añadido una vez en tu página, incluso si incrustas múltiples snippets. Un buen lugar es antes de la etiqueta de cierre `&lt;/body&gt;`.
+                        Copia el código del iframe para incrustar el snippet en tu sitio web. El iframe se ajustará al ancho de su contenedor. Puedes ajustar la altura en tu propio CSS si es necesario.
                     </AlertDescription>
                 </Alert>
               </div>

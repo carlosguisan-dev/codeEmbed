@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, Loader2, Code, Bug } from 'lucide-react';
+import { LayoutDashboard, Loader2, Code } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -97,14 +97,6 @@ function AppLayout({ children }: { children: React.ReactNode }) {
                     <Link href="/snippets/new">
                         <Code/>
                         <span>{t('new_snippet_title')}</span>
-                    </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={t('debug_embeds_title')}>
-                    <Link href="/debug-embeds">
-                        <Bug/>
-                        <span>{t('debug_embeds_title')}</span>
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>

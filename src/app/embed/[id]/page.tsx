@@ -6,12 +6,11 @@ import type { Snippet } from '@/lib/definitions';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import { useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { CodePreview } from '@/components/code-preview';
-import { useEffect, useMemo } from 'react';
-import { Logo } from '@/components/icons';
-import { useTranslation } from '@/hooks/use-translation';
-import Link from 'next/link';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useEffect } from 'react';
+import { SnippetEmbedView } from '@/components/snippet-embed-view';
+import { SnippetLinkView } from '@/components/snippet-link-view';
+
 
 type Props = {
   params: { id: string };
@@ -19,10 +18,9 @@ type Props = {
 
 export default function EmbedPage({ params }: Props) {
   const { firestore } = useFirebase();
-  const { t } = useTranslation();
   const searchParams = useSearchParams();
 
-  // Determine view type. If showTitle is not present, it's the full link view.
+  // Determine view type. If showTitle is present, it's the iframe view.
   const isIframeView = searchParams.has('showTitle');
   const showTitleInFooter = searchParams.get('showTitle') !== 'false';
   
@@ -67,9 +65,6 @@ export default function EmbedPage({ params }: Props) {
                 <CardContent className="p-0">
                     <Skeleton className="h-64 w-full rounded-none" />
                 </CardContent>
-                <CardFooter className="p-4">
-                     <Skeleton className="h-6 w-1/4 ml-auto" />
-                </CardFooter>
             </Card>
         </div>
     )
@@ -102,45 +97,10 @@ export default function EmbedPage({ params }: Props) {
       return null;
   }
 
-  const embedUrl = `/embed/${snippet.id}`;
+  if (isIframeView) {
+      return <SnippetEmbedView snippet={snippet} showTitle={showTitleInFooter} />
+  }
 
-  return (
-    <div className="p-4 sm:p-6 md:p-8 bg-transparent">
-        <Card id="embed-root" className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl overflow-hidden text-left rounded-lg flex flex-col">
-             {isIframeView && (
-                 <CardHeader className="block sm:hidden">
-                    <CardTitle className="font-headline text-2xl">{snippet.title}</CardTitle>
-                </CardHeader>
-             )}
-            <CardContent id="embed-code-content" className="p-0 flex-grow">
-            <CodePreview
-                code={snippet.code}
-                language={snippet.language}
-                theme={snippet.theme}
-                showLineNumbers={snippet.lineNumbers}
-                isEmbed={true}
-                className="rounded-none shadow-none border-0"
-            />
-            </CardContent>
-            
-            <CardFooter className="bg-muted/50 px-4 py-3 flex items-center justify-between">
-                {showTitleInFooter && isIframeView && (
-                    <span className="text-sm font-semibold truncate pr-4 hidden sm:block">{snippet.title}</span>
-                )}
-                <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
-                    <span>{t('powered_by')}</span>
-                    <Logo width={100} height={25} />
-                </Link>
-            </CardFooter>
-        </Card>
-        {!isIframeView && (
-            <Card className="w-full max-w-4xl mx-auto mt-6">
-                <CardHeader>
-                    <CardTitle className="font-headline text-2xl">{snippet.title}</CardTitle>
-                    {snippet.description && <CardDescription className="mt-1">{snippet.description}</CardDescription>}
-                </CardHeader>
-            </Card>
-        )}
-    </div>
-  );
+  return <SnippetLinkView snippet={snippet} />
 }
+

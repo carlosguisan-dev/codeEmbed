@@ -94,5 +94,6 @@
     "show_description_label": "Show Description",
     "show_description_desc": "Include the snippet's description in the embed.",
     "view_one": "1 view",
-    "view_other": "{{count}} views"
+    "view_other": "{{count}} views",
+    "shared_from": "Shared from"
 }

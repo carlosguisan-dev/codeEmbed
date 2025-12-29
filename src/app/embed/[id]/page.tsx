@@ -20,7 +20,7 @@ import { Logo } from '@/components/icons';
 import { useTranslation } from '@/hooks/use-translation';
 
 
-function EmbedPageContent({ id }: { id: string }) {
+function EmbedPageContent({ snippet: initialSnippet, id }: { snippet: Snippet, id: string }) {
   const { firestore } = useFirebase();
   const { t } = useTranslation();
   const searchParams = useSearchParams();
@@ -32,11 +32,15 @@ function EmbedPageContent({ id }: { id: string }) {
     () => (firestore ? doc(firestore, 'snippets', id) : null),
     [firestore, id]
   );
+  // We use the initial snippet from the server, but useDoc will keep it up-to-date in real-time if needed.
   const { data: snippet, isLoading } = useDoc<Snippet>(snippetRef);
+
+  const displaySnippet = snippet || initialSnippet;
+
 
   useEffect(() => {
     // This effect handles incrementing the view count once per session.
-    if (snippet && firestore) {
+    if (displaySnippet && firestore) {
       const sessionStorageKey = `viewed-snippet-${id}`;
       const hasViewed = sessionStorage.getItem(sessionStorageKey);
 
@@ -58,10 +62,10 @@ function EmbedPageContent({ id }: { id: string }) {
         });
       }
     }
-  }, [snippet, firestore, id]);
+  }, [displaySnippet, firestore, id]);
 
 
-  if (isLoading) {
+  if (isLoading && !displaySnippet) {
     return (
         <div className="p-4 sm:p-6 md:p-8">
             <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl">
@@ -77,21 +81,21 @@ function EmbedPageContent({ id }: { id: string }) {
     )
   }
 
-  if (!snippet) {
+  if (!displaySnippet) {
     notFound();
   }
   
-  const embedUrl = `/embed/${snippet.id}`;
+  const embedUrl = `/embed/${displaySnippet.id}`;
   const isCompact = !showTitle && !showDescription;
 
   if (isCompact) {
     return (
       <div className="flex flex-col h-screen">
           <CodePreview
-            code={snippet.code}
-            language={snippet.language}
-            theme={snippet.theme}
-            showLineNumbers={snippet.lineNumbers}
+            code={displaySnippet.code}
+            language={displaySnippet.language}
+            theme={displaySnippet.theme}
+            showLineNumbers={displaySnippet.lineNumbers}
             isEmbed={true}
             className="flex-grow rounded-none border-none"
           />
@@ -113,18 +117,18 @@ function EmbedPageContent({ id }: { id: string }) {
             <div className="flex items-start gap-4">
                 {(showTitle || showDescription) && <FileText className="w-8 h-8 text-primary mt-1" />}
                 <div>
-                {showTitle && <CardTitle className="font-headline text-2xl">{snippet.title}</CardTitle>}
-                {showDescription && <CardDescription>{snippet.description}</CardDescription>}
+                {showTitle && <CardTitle className="font-headline text-2xl">{displaySnippet.title}</CardTitle>}
+                {showDescription && <CardDescription>{displaySnippet.description}</CardDescription>}
                 </div>
             </div>
             </CardHeader>
         )}
         <CardContent>
           <CodePreview
-            code={snippet.code}
-            language={snippet.language}
-            theme={snippet.theme}
-            showLineNumbers={snippet.lineNumbers}
+            code={displaySnippet.code}
+            language={displaySnippet.language}
+            theme={displaySnippet.theme}
+            showLineNumbers={displaySnippet.lineNumbers}
             isEmbed={true}
           />
         </CardContent>
@@ -141,5 +145,32 @@ function EmbedPageContent({ id }: { id: string }) {
 
 
 export default function EmbedPage({ params }: { params: { id: string } }) {
-    return <EmbedPageContent id={params.id} />
+  const { firestore } = useFirebase();
+  const snippetRef = useMemoFirebase(
+    () => (firestore ? doc(firestore, 'snippets', params.id) : null),
+    [firestore, params.id]
+  );
+  const { data: snippet, isLoading } = useDoc<Snippet>(snippetRef);
+
+  if (isLoading) {
+     return (
+        <div className="p-4 sm:p-6 md:p-8">
+            <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl">
+                <CardHeader>
+                    <Skeleton className="h-12 w-3/4" />
+                    <Skeleton className="h-6 w-1/2" />
+                </CardHeader>
+                <CardContent>
+                    <Skeleton className="h-64 w-full" />
+                </CardContent>
+            </Card>
+        </div>
+    )
+  }
+
+  if (!snippet) {
+    notFound();
+  }
+
+  return <EmbedPageContent snippet={snippet} id={params.id} />
 }

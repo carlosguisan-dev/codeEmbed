@@ -94,5 +94,6 @@
     "show_description_label": "Mostrar Descripción",
     "show_description_desc": "Incluye la descripción del snippet en la incrustación.",
     "view_one": "1 vista",
-    "view_other": "{{count}} vistas"
+    "view_other": "{{count}} vistas",
+    "shared_from": "Compartido desde"
 }

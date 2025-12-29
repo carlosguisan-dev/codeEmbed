@@ -25,7 +25,7 @@ export function SnippetCard({ snippet }: { snippet: Snippet }) {
           </div>
         </div>
       </CardHeader>
-      <CardFooter>
+      <CardFooter className="p-6">
         <div className="flex justify-between items-center w-full">
             <Badge variant="secondary">{snippet.language}</Badge>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">

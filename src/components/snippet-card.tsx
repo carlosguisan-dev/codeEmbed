@@ -1,3 +1,4 @@
+
 'use client';
 import type { Snippet } from '@/lib/definitions';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -25,7 +26,7 @@ export function SnippetCard({ snippet }: { snippet: Snippet }) {
           </div>
         </div>
       </CardHeader>
-      <CardFooter className="p-6">
+      <CardFooter className="p-6 mt-auto">
         <div className="flex justify-between items-center w-full">
             <Badge variant="secondary">{snippet.language}</Badge>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">

@@ -1,37 +1,22 @@
 
 'use client';
 
-import { useState } from 'react';
-import { useCollection, useFirebase, useMemoFirebase } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
-import type { Snippet } from '@/lib/definitions';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState, useMemo } from 'react';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
 import { TranslationProvider, useTranslation } from '@/hooks/use-translation';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Bug } from 'lucide-react';
 
 function DebugEmbedsPageContent() {
-  const { firestore, user } = useFirebase();
-  const [selectedSnippetId, setSelectedSnippetId] = useState<string | null>(null);
   const { t } = useTranslation();
+  const [iframeCode, setIframeCode] = useState('');
 
-  const publicSnippetsQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return query(
-      collection(firestore, 'snippets'),
-      where('userId', '==', user.uid),
-      where('isPublic', '==', true)
-    );
-  }, [firestore, user]);
-
-  const { data: snippets, isLoading } = useCollection<Snippet>(publicSnippetsQuery);
-
-  const handleSelectChange = (snippetId: string) => {
-    setSelectedSnippetId(snippetId);
-  };
-
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-  const embedUrl = selectedSnippetId ? `${baseUrl}/embed/${selectedSnippetId}` : '';
+  const embedSrc = useMemo(() => {
+    if (!iframeCode) return '';
+    const match = iframeCode.match(/src="([^"]*)"/);
+    return match ? match[1] : '';
+  }, [iframeCode]);
 
   return (
     <div className="space-y-6">
@@ -39,31 +24,19 @@ function DebugEmbedsPageContent() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Select a Public Snippet to Preview</CardTitle>
+          <CardTitle>Pegar código de Iframe</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <Loader2 className="h-6 w-6 animate-spin" />
-          ) : snippets && snippets.length > 0 ? (
-            <Select onValueChange={handleSelectChange}>
-              <SelectTrigger className="w-full md:w-1/2">
-                <SelectValue placeholder="Select a snippet..." />
-              </SelectTrigger>
-              <SelectContent>
-                {snippets.map((snippet) => (
-                  <SelectItem key={snippet.id} value={snippet.id}>
-                    {snippet.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : (
-            <p className="text-muted-foreground">You have no public snippets to preview.</p>
-          )}
+          <Textarea
+            placeholder='<iframe src="..." style="width:100%;border:0;" loading="lazy" allowfullscreen></iframe>'
+            value={iframeCode}
+            onChange={(e) => setIframeCode(e.target.value)}
+            className="font-code h-32"
+          />
         </CardContent>
       </Card>
 
-      {selectedSnippetId && (
+      {embedSrc ? (
         <Card>
           <CardHeader>
             <CardTitle>Iframe Preview</CardTitle>
@@ -71,30 +44,39 @@ function DebugEmbedsPageContent() {
           <CardContent>
             <div className="w-full aspect-video rounded-lg border bg-muted">
               <iframe
-                key={selectedSnippetId}
-                src={embedUrl}
+                key={embedSrc}
+                src={embedSrc}
                 className="w-full h-full"
                 title="Snippet Embed Preview"
                 loading="lazy"
                 allowFullScreen
               ></iframe>
             </div>
-             <div className="mt-4">
-                <p className="text-sm font-medium">Embed URL:</p>
-                <code className="text-xs bg-muted text-muted-foreground p-2 rounded-md block mt-1">{embedUrl}</code>
-             </div>
+            <div className="mt-4">
+              <p className="text-sm font-medium">Embed URL:</p>
+              <code className="text-xs bg-muted text-muted-foreground p-2 rounded-md block mt-1">
+                {embedSrc}
+              </code>
+            </div>
           </CardContent>
         </Card>
+      ) : (
+        <Alert>
+          <Bug className="h-4 w-4" />
+          <AlertTitle>Esperando Iframe</AlertTitle>
+          <AlertDescription>
+            Pega el código de un iframe en el área de texto de arriba para previsualizarlo aquí.
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   );
 }
 
-
 export default function DebugEmbedsPage() {
-    return (
-        <TranslationProvider>
-            <DebugEmbedsPageContent />
-        </TranslationProvider>
-    )
+  return (
+    <TranslationProvider>
+      <DebugEmbedsPageContent />
+    </TranslationProvider>
+  );
 }

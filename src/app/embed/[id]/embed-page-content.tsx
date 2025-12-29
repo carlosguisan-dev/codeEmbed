@@ -114,7 +114,7 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
           />
         </CardContent>
         
-        <div className="bg-muted/50 p-2 flex items-center">
+        <div className="bg-muted/50 px-4 py-2 flex items-center">
             <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
                 <span>{t('powered_by')}</span>
                 <Logo width={100} height={25} />

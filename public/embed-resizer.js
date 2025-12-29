@@ -1,19 +1,26 @@
-// This script listens for messages from embedded CodeEmbed iframes and resizes them to match their content height.
+
+'use strict';
+
+// Listen for messages from any embedded snippet iframes
 window.addEventListener('message', function (event) {
-  // IMPORTANT: Check the origin of the message for security
-  // You might want to restrict this to your app's domain in a production environment
-  // if (event.origin !== 'https://your-app-domain.com') {
-  //   return;
-  // }
-
-  const data = event.data;
-
-  // Check if the message is from our CodeEmbed iframe
-  if (data && data.type === 'code-embed-resize' && data.snippetId) {
-    const iframe = document.getElementById('code-embed-' + data.snippetId);
-    
-    if (iframe) {
-      iframe.style.height = data.height + 'px';
-    }
+  // We only care about messages of a specific type from our app
+  if (typeof event.data !== 'object' || event.data.type !== 'code-embed-resize') {
+    return;
   }
-});
+
+  var data = event.data;
+  var snippetId = data.snippetId;
+  var height = data.height;
+
+  if (!snippetId || !height) {
+    return;
+  }
+
+  // Find the corresponding iframe using the data-attribute
+  var iframe = document.querySelector('iframe[data-code-embed-id="' + snippetId + '"]');
+
+  if (iframe) {
+    // Set the height of the iframe, adding a small buffer just in case.
+    iframe.style.height = (Number(height) + 16) + 'px';
+  }
+}, false);

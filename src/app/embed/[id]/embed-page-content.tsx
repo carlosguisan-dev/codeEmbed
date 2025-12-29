@@ -90,44 +90,22 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
   const embedUrl = `/embed/${displaySnippet.id}`;
   const isCompact = !showTitle && !showDescription;
 
-  if (isCompact) {
-    return (
-      <div id="embed-root">
-          <div id="embed-code-content">
-            <CodePreview
-                code={displaySnippet.code}
-                language={displaySnippet.language}
-                theme={displaySnippet.theme}
-                showLineNumbers={displaySnippet.lineNumbers}
-                isEmbed={true}
-                className="rounded-none border-none"
-            />
-          </div>
-        <CardFooter id="embed-footer" className="bg-muted/50 px-4 py-2 mt-auto">
-            <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
-                <span>{t('powered_by')}</span>
-                <Logo width={100} height={25} />
-            </Link>
-        </CardFooter>
-      </div>
-    );
-  }
-
   return (
-    <div id="embed-root" className="p-4 sm:p-6 md:p-8">
-      <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl overflow-hidden">
-        {(showTitle || showDescription) && (
+    <div id="embed-root" className="min-h-0">
+      <Card className="w-full max-w-4xl mx-auto border-0 shadow-none overflow-hidden rounded-none">
+        {(showTitle || showDescription) && !isCompact && (
             <CardHeader id="embed-header">
-            <div className="flex items-start gap-4">
-                {(showTitle || showDescription) && <FileText className="w-8 h-8 text-primary mt-1" />}
-                <div>
-                {showTitle && <CardTitle className="font-headline text-2xl">{displaySnippet.title}</CardTitle>}
-                {showDescription && <CardDescription>{displaySnippet.description}</CardDescription>}
+              <div className="flex items-start gap-4">
+                {(showTitle || showDescription) && <FileText className="w-8 h-8 text-primary mt-1 flex-shrink-0" />}
+                <div className="flex-grow">
+                  {showTitle && <CardTitle className="font-headline text-2xl">{displaySnippet.title}</CardTitle>}
+                  {showDescription && <CardDescription className="mt-1">{displaySnippet.description}</CardDescription>}
                 </div>
-            </div>
+              </div>
             </CardHeader>
         )}
-        <CardContent id="embed-code-content">
+        
+        <CardContent id="embed-code-content" className={isCompact ? 'p-0' : ''}>
           <CodePreview
             code={displaySnippet.code}
             language={displaySnippet.language}
@@ -136,6 +114,7 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
             isEmbed={true}
           />
         </CardContent>
+        
         <CardFooter id="embed-footer" className="bg-muted/50 px-4 py-2">
             <Link href={embedUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors ml-auto">
                 <span>{t('powered_by')}</span>

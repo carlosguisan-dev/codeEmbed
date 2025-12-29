@@ -43,7 +43,9 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   });
 
   const embedUrl = `${baseUrl}/embed/${snippet.id}?${queryParams.toString()}`;
-  const iframeCode = `<iframe src="${embedUrl}" id="code-embed-${snippet.id}" style="width:100%;border:0;border-radius:4px;overflow:hidden;" title="${snippet.title}" allow="clipboard-write" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>`;
+  
+  // The iframe now includes a data-attribute for the resizer script to find it.
+  const iframeCode = `<iframe src="${embedUrl}" data-code-embed-id="${snippet.id}" style="width:100%; border:0; overflow:hidden;" title="${snippet.title}" allow="clipboard-write" sandbox="allow-scripts allow-same-origin" loading="lazy"></iframe>`;
   const resizerScriptCode = `<script src="${baseUrl}/embed-resizer.js" async></script>`;
 
   useEffect(() => {
@@ -133,7 +135,7 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
                     <Info className="h-4 w-4" />
                     <AlertTitle>¡Importante!</AlertTitle>
                     <AlertDescription>
-                        Para que la altura del snippet se ajuste automáticamente, pega el Iframe y el Script en tu HTML.
+                        Para que la altura del snippet se ajuste automáticamente, pega el Iframe en tu contenido y el Script una sola vez en tu página, antes de la etiqueta &lt;/body&gt;.
                     </AlertDescription>
                 </Alert>
               </div>

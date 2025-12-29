@@ -1,5 +1,6 @@
 'use client';
 import './globals.css';
+import { Work_Sans, Fira_Code } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
 import { TranslationProvider, useTranslation } from '@/hooks/use-translation';
 import React from 'react';
@@ -20,6 +21,21 @@ import { Logo } from '@/components/icons';
 import { FirebaseClientProvider, useFirebase } from '@/firebase';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { cn } from '@/lib/utils';
+
+
+const workSans = Work_Sans({
+  subsets: ['latin'],
+  variable: '--font-work-sans',
+  display: 'swap',
+});
+
+const firaCode = Fira_Code({
+  subsets: ['latin'],
+  variable: '--font-fira-code',
+  display: 'swap',
+});
+
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -122,7 +138,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.png" type="image/png" />
       </head>
-      <body className="font-body antialiased">
+      <body className={cn("font-body antialiased", workSans.variable, firaCode.variable)}>
         <FirebaseClientProvider>
           <TranslationProvider>
             <AppLayout>

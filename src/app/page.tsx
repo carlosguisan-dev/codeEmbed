@@ -58,7 +58,7 @@ export default function LandingPage() {
                           <span className="text-xs text-foreground/80">javascript</span>
                           <span className="text-xs text-foreground/50">code-embed.app</span>
                       </div>
-                      <pre className="text-sm text-foreground/90 whitespace-pre-wrap break-words p-4">
+                      <pre className="text-sm text-foreground/90 whitespace-pre-wrap break-words p-4 font-code">
                         <code dangerouslySetInnerHTML={{ __html: codeExample }} />
                       </pre>
                        <div className="bg-muted/50 px-4 py-2 border-t">

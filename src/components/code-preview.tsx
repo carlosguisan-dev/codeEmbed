@@ -30,7 +30,7 @@ export function CodePreview({ code, language, theme, showLineNumbers, isEmbed = 
   return (
     <div
       className={cn(
-        'relative group rounded-lg border text-sm overflow-hidden',
+        'relative group rounded-lg border text-sm overflow-hidden font-code',
         theme === 'dark' ? 'dark bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200',
         className
       )}
@@ -57,7 +57,7 @@ export function CodePreview({ code, language, theme, showLineNumbers, isEmbed = 
           <span className="ml-2">{hasCopied ? t('copied') : t('copy')}</span>
         </Button>
       </div>
-      <pre className={cn('p-4 font-code whitespace-pre-wrap break-words', theme === 'dark' ? 'text-gray-300' : 'text-gray-800')}>
+      <pre className={cn('p-4 whitespace-pre-wrap break-words', theme === 'dark' ? 'text-gray-300' : 'text-gray-800')}>
         <div className="flex">
           {showLineNumbers && (
             <div className="text-right pr-4 select-none opacity-50">

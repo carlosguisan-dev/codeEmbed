@@ -16,7 +16,7 @@ import { useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import type { Snippet } from '@/lib/definitions';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Logo } from '@/components/icons';
 import { useTranslation } from '@/hooks/use-translation';
 
@@ -25,8 +25,6 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
   const { firestore } = useFirebase();
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-  const embedRef = useRef<HTMLDivElement>(null);
-
 
   const showTitle = searchParams.get('showTitle') !== 'false';
   const showDescription = searchParams.get('showDescription') !== 'false';
@@ -35,28 +33,12 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
     () => (firestore ? doc(firestore, 'snippets', id) : null),
     [firestore, id]
   );
-  // We use the initial snippet from the server, but useDoc will keep it up-to-date in real-time if needed.
+  
   const { data: snippet, isLoading } = useDoc<Snippet>(snippetRef, {
       initialData: initialSnippet
   });
 
   const displaySnippet = snippet || initialSnippet;
-
-  useEffect(() => {
-    // This effect sends the height of the content to the parent window
-    // which can be used to resize the iframe.
-    if (embedRef.current) {
-        const height = embedRef.current.scrollHeight;
-        window.parent.postMessage({
-            type: 'code-embed-resize',
-            payload: {
-                id: displaySnippet.id,
-                height: height
-            }
-        }, '*');
-    }
-  });
-
 
   useEffect(() => {
     // This effect handles incrementing the view count once per session.
@@ -110,7 +92,7 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
 
   if (isCompact) {
     return (
-      <div ref={embedRef}>
+      <div>
           <CodePreview
             code={displaySnippet.code}
             language={displaySnippet.language}
@@ -130,7 +112,7 @@ export default function EmbedPageContent({ snippet: initialSnippet, id }: { snip
   }
 
   return (
-    <div ref={embedRef} className="p-4 sm:p-6 md:p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl overflow-hidden">
         {(showTitle || showDescription) && (
             <CardHeader>

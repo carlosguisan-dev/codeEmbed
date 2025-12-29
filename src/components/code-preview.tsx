@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -93,17 +94,19 @@ export function CodePreview({
       </div>
       
       <pre className="p-4 overflow-auto">
-        <code className="font-code text-sm whitespace-pre-wrap">
+        <code className="font-code text-sm whitespace-pre">
           {showLineNumbers ? (
             <div className="flex">
               <div className="text-right select-none opacity-50 pr-4">
                 {lines.map((_, index) => (
-                  <div key={index}>{index + 1}</div>
+                  <span key={index} className="block">{index + 1}</span>
                 ))}
               </div>
               <div className="flex-1">
                 {lines.map((line, index) => (
-                  <div key={index}>{line}</div>
+                  <span key={index} className="block">
+                    {line.length > 0 ? line : '\u00A0'}
+                  </span>
                 ))}
               </div>
             </div>

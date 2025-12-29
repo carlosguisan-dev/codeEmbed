@@ -18,22 +18,45 @@ async function getSnippet(id: string): Promise<Snippet | null> {
         const snippetDoc = await db.collection('snippets').doc(id).get();
 
         if (!snippetDoc.exists) {
+            console.log(`Snippet with ID ${id} not found.`);
             return null;
         }
 
-        const snippetData = snippetDoc.data() as Omit<Snippet, 'id' | 'createdAt' | 'updatedAt'> & { createdAt: Timestamp, updatedAt: Timestamp};
+        const snippetData = snippetDoc.data();
+        if (!snippetData) {
+            console.log(`Snippet data is empty for ID ${id}.`);
+            return null;
+        }
+
 
         // Ensure that the snippet is public before returning it
-        if (!snippetData.isPublic) {
+        if (snippetData.isPublic !== true) {
+            console.log(`Snippet with ID ${id} is not public.`);
             return null;
         }
         
+        // Safely handle Timestamps
+        const createdAt = snippetData.createdAt instanceof Timestamp 
+            ? snippetData.createdAt.toDate().toISOString() 
+            : new Date().toISOString();
+        
+        const updatedAt = snippetData.updatedAt instanceof Timestamp 
+            ? snippetData.updatedAt.toDate().toISOString() 
+            : new Date().toISOString();
+
         return {
             id: snippetDoc.id,
-            ...snippetData,
-            // Firestore Timestamps need to be converted to strings for serialization
-            createdAt: snippetData.createdAt.toDate().toISOString(),
-            updatedAt: snippetData.updatedAt.toDate().toISOString(),
+            userId: snippetData.userId,
+            title: snippetData.title,
+            description: snippetData.description || '',
+            code: snippetData.code,
+            language: snippetData.language,
+            theme: snippetData.theme,
+            lineNumbers: snippetData.lineNumbers,
+            isPublic: snippetData.isPublic,
+            viewCount: snippetData.viewCount || 0,
+            createdAt,
+            updatedAt,
         };
     } catch (error) {
         console.error("Error fetching snippet server-side:", error);
@@ -82,3 +105,4 @@ export default async function EmbedPage({ params }: Props) {
   // We pass the server-fetched snippet to the client component
   return <EmbedPageContent snippet={snippet} id={params.id} />;
 }
+

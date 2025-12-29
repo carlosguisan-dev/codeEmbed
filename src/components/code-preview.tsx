@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 import { useTranslation } from '@/hooks/use-translation';
 import { Textarea } from './ui/textarea';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { atomDark, a11yLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 type CodePreviewProps = {
   code: string;
@@ -40,8 +39,6 @@ export function CodePreview({
     setTimeout(() => setHasCopied(false), 2000);
   };
   
-  const selectedTheme = theme === 'dark' ? atomDark : a11yLight;
-
   if (isEditable) {
     return (
       <div className={cn('relative group rounded-lg border text-sm overflow-hidden font-code', className)}>
@@ -62,14 +59,14 @@ export function CodePreview({
     <div
       className={cn(
         'relative group rounded-lg border text-sm overflow-hidden font-code',
-        theme === 'dark' ? 'dark' : '',
+        theme === 'dark' ? 'dark-theme' : 'light-theme',
         isEmbed ? '!rounded-none !border-0' : '',
         className
       )}
     >
       <div className={cn(
         'flex items-center justify-between px-4 py-2 border-b',
-        theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-gray-100 border-gray-200'
+        theme === 'dark' ? 'bg-[#282c34] border-gray-700' : 'bg-gray-100 border-gray-200'
       )}>
         <span className={cn('text-xs font-semibold', theme === 'dark' ? 'text-gray-400' : 'text-gray-600')}>
           {language}
@@ -92,16 +89,11 @@ export function CodePreview({
       
       <SyntaxHighlighter
         language={language}
-        style={selectedTheme}
+        useInlineStyles={false}
         showLineNumbers={showLineNumbers}
         wrapLines={true}
         wrapLongLines={true}
-        customStyle={{ 
-            margin: 0,
-            padding: '1rem',
-            borderRadius: 0,
-            backgroundColor: theme === 'dark' ? '#0d1117' : '#fafafa'
-        }}
+        className="!p-4 !m-0 !rounded-none"
         codeTagProps={{
             style: {
                 fontFamily: 'inherit'

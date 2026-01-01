@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState }from 'react';
+import { useState, useEffect }from 'react';
 import {
   Dialog,
   DialogContent,
@@ -31,20 +31,27 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
   const [showTitle, setShowTitle] = useState(true);
   const [hasCopiedCode, setHasCopiedCode] = useState(false);
   const [hasCopiedLink, setHasCopiedLink] = useState(false);
+  const [baseUrl, setBaseUrl] = useState('');
+
+  useEffect(() => {
+    // This ensures that window is accessed only on the client side, preventing hydration errors.
+    if (typeof window !== 'undefined') {
+      setBaseUrl(window.location.origin);
+    }
+  }, []);
 
   if (!snippet) return null;
-
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
   
   const queryParams = new URLSearchParams();
   queryParams.set('showTitle', String(showTitle));
   
-  const embedUrl = `${baseUrl}/embed/${snippet.id}?${queryParams.toString()}`;
-  const directLinkUrl = `${baseUrl}/s/${snippet.id}`;
+  const embedUrl = baseUrl ? `${baseUrl}/embed/${snippet.id}?${queryParams.toString()}` : '';
+  const directLinkUrl = baseUrl ? `${baseUrl}/s/${snippet.id}` : '';
   
-  const iframeCode = `<iframe src="${embedUrl}" style="width:100%; border:0; height: 350px;" loading="lazy" allowfullscreen></iframe>`;
+  const iframeCode = embedUrl ? `<iframe src="${embedUrl}" style="width:100%; border:0; height: 350px;" loading="lazy" allowfullscreen></iframe>` : '';
 
   const handleCopy = (textToCopy: string, type: 'code' | 'link') => {
+    if (!textToCopy) return;
     navigator.clipboard.writeText(textToCopy);
     if (type === 'code') {
       setHasCopiedCode(true);
@@ -85,6 +92,7 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
                             value={iframeCode}
                             readOnly
                             className="font-code text-sm min-h-[100px] resize-none pr-12"
+                            placeholder={t('generating_code_placeholder', 'Generating embed code...')}
                         />
                         <Button
                             type="button"
@@ -92,6 +100,7 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
                             variant="ghost"
                             className="absolute top-2 right-2 h-7 w-7 text-muted-foreground hover:bg-muted"
                             onClick={() => handleCopy(iframeCode, 'code')}
+                            disabled={!iframeCode}
                         >
                             {hasCopiedCode ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
                         </Button>
@@ -100,12 +109,13 @@ export function EmbedDialog({ snippet, open, onOpenChange }: EmbedDialogProps) {
                 <div className="grid w-full items-center gap-1.5">
                     <Label htmlFor="direct-link">{t('direct_link')}</Label>
                     <div className="flex items-center space-x-2">
-                        <Input id="direct-link" value={directLinkUrl} readOnly />
+                        <Input id="direct-link" value={directLinkUrl} readOnly placeholder={t('generating_link_placeholder', 'Generating link...')} />
                         <Button
                             type="button"
                             size="icon"
                             variant="outline"
                             onClick={() => handleCopy(directLinkUrl, 'link')}
+                            disabled={!directLinkUrl}
                         >
                             {hasCopiedLink ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
                         </Button>

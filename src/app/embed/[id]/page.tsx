@@ -22,7 +22,7 @@ function PrivateSnippetNotice() {
       <div className="flex items-center justify-center h-full p-4">
         <Card className="w-full max-w-lg text-center">
           <CardHeader>
-            <CardHeader.Title>{t('private_snippet_warning_title')}</CardHeader.Title>
+            <h2 className="text-2xl font-bold font-headline">{t('private_snippet_warning_title')}</h2>
           </CardHeader>
           <CardContent>
             <p>{t('private_snippet_embed_warning')}</p>
@@ -47,6 +47,7 @@ export default function EmbedPage({ params }: Props) {
   
   const { data: snippet, isLoading, error } = useDoc<Snippet>(snippetRef);
   
+  /*
   useEffect(() => {
     if (snippet && firestore) {
       const sessionStorageKey = `viewed-snippet-${params.id}`;
@@ -69,17 +70,18 @@ export default function EmbedPage({ params }: Props) {
       }
     }
   }, [snippet, firestore, params.id]);
+  */
 
 
   if (isLoading) {
     return (
-        <div className="p-4 sm:p-6 md:p-8 bg-transparent">
-            <Card className="w-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl rounded-lg">
+        <div className="w-full h-full p-4 sm:p-6 md:p-8 bg-transparent">
+            <Card className="w-full h-full max-w-4xl mx-auto border-2 border-primary/20 shadow-xl rounded-lg flex flex-col">
                 <CardHeader>
                     <Skeleton className="h-8 w-1/2" />
                 </CardHeader>
-                <CardContent className="p-0">
-                    <Skeleton className="h-64 w-full rounded-none" />
+                <CardContent className="p-0 flex-grow">
+                    <Skeleton className="h-full w-full rounded-none" />
                 </CardContent>
             </Card>
         </div>
